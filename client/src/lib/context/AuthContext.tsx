@@ -197,12 +197,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Auto-login for demo using the existing Sarah account
+  // Auto-login is disabled in favor of the login page
+  // For testing, you can uncomment the code below
+  /*
   useEffect(() => {
     if (!state.loading && !state.isAuthenticated) {
       login({ username: "sarah", password: "password123" });
     }
   }, [state.loading, state.isAuthenticated]);
+  */
 
   return (
     <AuthContext.Provider
