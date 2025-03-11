@@ -24,7 +24,7 @@ function Router() {
   
   // Redirect to home if not at one of the main tabs
   useEffect(() => {
-    const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth"];
+    const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth", "/debug"];
     if (isAuthenticated && !validRoutes.includes(location)) {
       setLocation("/");
     }
@@ -38,6 +38,7 @@ function Router() {
       <ProtectedRoute path="/nutrition" component={Nutrition} />
       <ProtectedRoute path="/profile" component={Profile} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/debug" component={DebugPage} />
       <Route component={NotFound} />
     </Switch>
   );
