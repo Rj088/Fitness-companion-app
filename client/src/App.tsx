@@ -12,6 +12,8 @@ import TabBar from "@/components/TabBar";
 import StatusBar from "@/components/StatusBar";
 import { useAuth } from "./lib/context/AuthContext";
 import { useEffect } from "react";
+import { initializeNativeCapabilities, isNativePlatform } from "./lib/native";
+import { useToast } from "@/hooks/use-toast";
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -38,6 +40,32 @@ function Router() {
 }
 
 function App() {
+  const { toast } = useToast();
+
+  // Initialize native capabilities if running in a native app
+  useEffect(() => {
+    const setupNative = async () => {
+      try {
+        const isNative = await isNativePlatform();
+        if (isNative) {
+          await initializeNativeCapabilities();
+          console.log("Native capabilities initialized");
+        } else {
+          console.log("Running in web environment");
+        }
+      } catch (error) {
+        console.error("Error initializing native capabilities:", error);
+        toast({
+          title: "App Initialization",
+          description: "Some device features may not be available.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    setupNative();
+  }, [toast]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-screen flex flex-col bg-gray-100">
