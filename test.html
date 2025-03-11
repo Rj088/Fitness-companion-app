@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FitTrack Auth Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .response {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>FitTrack Auth Test</h1>
+  
+  <h2>Login</h2>
+  <div class="form">
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" id="username" value="sarah">
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" value="password123">
+    </div>
+    <button onclick="login()">Login</button>
+  </div>
+  
+  <h3>Response:</h3>
+  <pre class="response" id="response"></pre>
+  
+  <script>
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const responseEl = document.getElementById('response');
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        responseEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (response.ok) {
+          // Store the user ID in localStorage
+          localStorage.setItem('fittrack_user_id', data.id.toString());
+          alert('Login successful! User ID stored in localStorage.');
+        }
+      } catch (error) {
+        responseEl.textContent = 'Error: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
