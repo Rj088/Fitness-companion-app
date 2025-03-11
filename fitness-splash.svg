@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="2732" height="2732" viewBox="0 0 2732 2732" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="2732" height="2732" fill="#0EA5E9"/>
+  
+  <!-- Fitness Icon - Dumbbell -->
+  <g transform="translate(866, 1116)" fill="white">
+    <rect x="0" y="100" width="1000" height="100" rx="50" />
+    <rect x="50" y="0" width="50" height="300" rx="25" />
+    <rect x="900" y="0" width="50" height="300" rx="25" />
+    <circle cx="75" cy="0" r="50" />
+    <circle cx="75" cy="300" r="50" />
+    <circle cx="925" cy="0" r="50" />
+    <circle cx="925" cy="300" r="50" />
+  </g>
+  
+  <!-- Heart Rate Line -->
+  <path d="M866 1466 L1066 1466 L1166 1266 L1266 1666 L1366 1366 L1466 1566 L1566 1466 L1866 1466" 
+        stroke="white" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- App Name -->
+  <text x="1366" y="2000" font-family="Arial" font-weight="bold" font-size="150" fill="white" text-anchor="middle">FITNESS APP</text>
+</svg>

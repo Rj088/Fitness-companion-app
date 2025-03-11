@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="220" fill="#0EA5E9"/>
+  
+  <!-- Fitness Icon - Dumbbell -->
+  <g transform="translate(212, 362)" fill="white">
+    <rect x="0" y="100" width="600" height="100" rx="50" />
+    <rect x="50" y="0" width="50" height="300" rx="25" />
+    <rect x="500" y="0" width="50" height="300" rx="25" />
+    <circle cx="75" cy="0" r="50" />
+    <circle cx="75" cy="300" r="50" />
+    <circle cx="525" cy="0" r="50" />
+    <circle cx="525" cy="300" r="50" />
+  </g>
+  
+  <!-- Heart Rate Line -->
+  <path d="M212 562 L312 562 L362 462 L412 662 L462 512 L512 612 L562 562 L812 562" 
+        stroke="white" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
