@@ -69,14 +69,16 @@ function App() {
     setupNative();
   }, [toast]);
 
+  const { isAuthenticated } = useAuth();
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-screen flex flex-col bg-gray-100">
-        <StatusBar />
-        <div className="flex-1 overflow-y-auto pb-24">
+        {isAuthenticated && <StatusBar />}
+        <div className={`flex-1 overflow-y-auto ${isAuthenticated ? 'pb-24' : ''}`}>
           <Router />
         </div>
-        <TabBar />
+        {isAuthenticated && <TabBar />}
       </div>
       <Toaster />
     </QueryClientProvider>
