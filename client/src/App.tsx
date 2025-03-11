@@ -8,12 +8,14 @@ import Workouts from "@/pages/Workouts";
 import Progress from "@/pages/Progress";
 import Nutrition from "@/pages/Nutrition";
 import Profile from "@/pages/Profile";
+import AuthPage from "@/pages/auth-page";
 import TabBar from "@/components/TabBar";
 import StatusBar from "@/components/StatusBar";
 import { useAuth } from "./lib/context/AuthContext";
 import { useEffect } from "react";
 import { initializeNativeCapabilities, isNativePlatform } from "./lib/native";
 import { useToast } from "@/hooks/use-toast";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -21,7 +23,7 @@ function Router() {
   
   // Redirect to home if not at one of the main tabs
   useEffect(() => {
-    const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile"];
+    const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth"];
     if (isAuthenticated && !validRoutes.includes(location)) {
       setLocation("/");
     }
@@ -29,11 +31,12 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/nutrition" component={Nutrition} />
-      <Route path="/profile" component={Profile} />
+      <ProtectedRoute path="/" component={Home} />
+      <ProtectedRoute path="/workouts" component={Workouts} />
+      <ProtectedRoute path="/progress" component={Progress} />
+      <ProtectedRoute path="/nutrition" component={Nutrition} />
+      <ProtectedRoute path="/profile" component={Profile} />
+      <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
   );
