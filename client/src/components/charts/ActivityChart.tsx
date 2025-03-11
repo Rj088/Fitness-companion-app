@@ -20,7 +20,7 @@ export default function ActivityChart({ data, period }: ActivityChartProps) {
     }
 
     // Determine scale based on max steps or max allowed value if steps are low
-    const maxSteps = Math.max(...data.map(day => day.steps), 1000);
+    const maxSteps = Math.max(...data.map(day => day.steps || 0), 1000);
     const yScale = Math.max(3000, Math.ceil(maxSteps / 1000) * 1000);
 
     // Y-axis labels
@@ -97,8 +97,9 @@ export default function ActivityChart({ data, period }: ActivityChartProps) {
     data.forEach((day, index) => {
       if (index >= 7 && period === "weekly") return; // Only show 7 days for weekly view
       
-      // Calculate height based on steps
-      const height = (day.steps / yScale) * 120;
+      // Calculate height based on steps, ensure steps is a number
+      const steps = day.steps || 0;
+      const height = (steps / yScale) * 120;
       const y = 140 - height;
       
       // Position based on day
@@ -106,8 +107,18 @@ export default function ActivityChart({ data, period }: ActivityChartProps) {
       
       // Determine if the bar is for a future day (empty)
       const today = new Date();
-      const dayDate = parseISO(day.date.toString());
-      const isFutureDay = dayDate > today;
+      let isFutureDay = false;
+      
+      // Safely parse date if it exists
+      if (day.date) {
+        try {
+          const dateStr = typeof day.date === 'string' ? day.date : day.date.toString();
+          const dayDate = parseISO(dateStr);
+          isFutureDay = dayDate > today;
+        } catch (error) {
+          console.error('Error parsing date:', error);
+        }
+      }
       
       // Create the bar
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");

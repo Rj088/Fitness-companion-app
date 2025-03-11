@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useActivities, useWeightLogs, useWorkoutHistory } from "@/lib/hooks/useProgress";
+import { useActivities, useWeightLogs, useWorkoutHistory, useUpdateActivity } from "@/lib/hooks/useProgress";
 import ActivityChart from "@/components/charts/ActivityChart";
 import WeightChart from "@/components/charts/WeightChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { getDeviceCapabilities } from "@/lib/native";
+import { getStepCounter, StepCounter } from "@/lib/stepCounter";
+import { useToast } from "@/hooks/use-toast";
 
 type PeriodType = "weekly" | "monthly";
 
@@ -14,16 +17,153 @@ export default function Progress() {
   const { data: activities, isLoading: activitiesLoading } = useActivities({ period });
   const { data: weightLogs, isLoading: weightLogsLoading } = useWeightLogs();
   const { data: workoutHistory, isLoading: workoutHistoryLoading } = useWorkoutHistory();
-
-  // Get weekly stats (mocked for now)
-  const weeklyStats = {
-    steps: 32546,
-    stepsChange: 12,
-    calories: 2345,
-    caloriesChange: 8,
-    activeMinutes: 185,
-    activeMinutesChange: 15
-  };
+  const { toast } = useToast();
+  const updateActivity = useUpdateActivity();
+  
+  // Step counter state
+  const [deviceSupportsTracking, setDeviceSupportsTracking] = useState(false);
+  const [isTrackingSteps, setIsTrackingSteps] = useState(false);
+  const [currentSteps, setCurrentSteps] = useState(0);
+  
+  // Weekly stats (initialize with loaded data or default values)
+  const [weeklyStats, setWeeklyStats] = useState({
+    steps: 0,
+    stepsChange: 0,
+    calories: 0,
+    caloriesChange: 0,
+    activeMinutes: 0,
+    activeMinutesChange: 0
+  });
+  
+  // Initialize device capabilities and step counter
+  useEffect(() => {
+    const initializeCapabilities = async () => {
+      try {
+        const capabilities = await getDeviceCapabilities();
+        setDeviceSupportsTracking(capabilities.isNative && capabilities.hasMotionSensors);
+        
+        // Initialize the step counter
+        if (capabilities.isNative && capabilities.hasMotionSensors) {
+          const stepCounter = getStepCounter({
+            sensitivity: 1.2,
+            debounceTime: 500,
+            onStep: (count) => {
+              setCurrentSteps(count);
+            },
+            onError: (error) => {
+              console.error('Step counter error:', error);
+              toast({
+                title: "Error",
+                description: "Could not track steps. Please ensure motion permissions are enabled.",
+                variant: "destructive",
+              });
+            }
+          });
+          
+          // Only start tracking when the Progress page is active
+          try {
+            await stepCounter.start();
+            setIsTrackingSteps(true);
+          } catch (error) {
+            console.error('Failed to start step counter:', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing capabilities:', error);
+      }
+    };
+    
+    initializeCapabilities();
+    
+    // Cleanup step counter when component unmounts
+    return () => {
+      if (isTrackingSteps) {
+        const stepCounter = getStepCounter();
+        stepCounter.stop();
+        setIsTrackingSteps(false);
+      }
+    };
+  }, [toast]);
+  
+  // Update weekly stats when activities data loads
+  useEffect(() => {
+    if (activities) {
+      // Make sure activities is an array
+      const activitiesArray = Array.isArray(activities) ? activities : [activities];
+      
+      if (activitiesArray.length > 0) {
+        const latestActivity = activitiesArray[activitiesArray.length - 1];
+        const todaySteps = latestActivity.steps || 0;
+        
+        // Safely calculate totals
+        let totalCalories = 0;
+        let totalMinutes = 0;
+        
+        activitiesArray.forEach(activity => {
+          totalCalories += activity.caloriesBurned || 0;
+          totalMinutes += activity.activeMinutes || 0;
+        });
+        
+        // Calculate changes (simplified for demo)
+        const stepsChange = 5; // Would be calculated based on comparison to previous week
+        const caloriesChange = 8; 
+        const minutesChange = 10;
+        
+        // Update with real data + current steps from device if tracking
+        setWeeklyStats({
+          steps: todaySteps + currentSteps,
+          stepsChange,
+          calories: totalCalories,
+          caloriesChange,
+          activeMinutes: totalMinutes,
+          activeMinutesChange: minutesChange
+        });
+      }
+    }
+  }, [activities, currentSteps]);
+  
+  // Sync step count with backend periodically if tracking is active
+  useEffect(() => {
+    if (isTrackingSteps && activities) {
+      // Make sure activities is an array
+      const activitiesArray = Array.isArray(activities) ? activities : [activities];
+      
+      if (activitiesArray.length > 0) {
+        const interval = setInterval(() => {
+          const latestActivity = activitiesArray[activitiesArray.length - 1];
+          
+          // Only update if we have new steps to add
+          if (currentSteps > 0 && latestActivity) {
+            const updatedSteps = (latestActivity.steps || 0) + currentSteps;
+            
+            // Calculate calories burned from steps (rough estimate: 0.04 calories per step)
+            const additionalCalories = Math.round(currentSteps * 0.04);
+            const updatedCalories = (latestActivity.caloriesBurned || 0) + additionalCalories;
+            
+            // Update the activity in the backend
+            // Make sure to include the date from the original activity
+            updateActivity.mutate({
+              id: latestActivity.id,
+              date: latestActivity.date,
+              steps: updatedSteps,
+              caloriesBurned: updatedCalories
+            });
+            
+            // Reset the step counter after syncing
+            const stepCounter = getStepCounter();
+            stepCounter.reset();
+            
+            toast({
+              title: "Steps Updated",
+              description: `Added ${currentSteps} steps to your daily total`,
+            });
+          }
+        }, 30000); // Sync every 30 seconds
+        
+        return () => clearInterval(interval);
+      }
+    }
+  }, [isTrackingSteps, activities, currentSteps, updateActivity, toast]);
 
   return (
     <div id="progress-screen" className="bg-white pb-24">
@@ -48,6 +188,43 @@ export default function Progress() {
         </div>
       </div>
       
+      {/* Activity Tracking Status */}
+      {deviceSupportsTracking && (
+        <div className="px-5 mb-2">
+          <div className={`p-3 rounded-xl text-sm flex items-center justify-between ${isTrackingSteps ? 'bg-green-50' : 'bg-gray-50'}`}>
+            <div className="flex items-center">
+              <div className={`w-8 h-8 rounded-full ${isTrackingSteps ? 'bg-green-100' : 'bg-gray-200'} flex items-center justify-center mr-2`}>
+                <i className={`fas fa-shoe-prints ${isTrackingSteps ? 'text-green-600' : 'text-gray-500'}`}></i>
+              </div>
+              <div>
+                <p className="font-medium">Step Tracking</p>
+                <p className="text-xs text-gray-500">
+                  {isTrackingSteps 
+                    ? `Currently tracking: ${currentSteps} steps` 
+                    : "Not currently tracking steps"}
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant={isTrackingSteps ? "outline" : "default"}
+              size="sm"
+              onClick={async () => {
+                const stepCounter = getStepCounter();
+                if (isTrackingSteps) {
+                  await stepCounter.stop();
+                  setIsTrackingSteps(false);
+                } else {
+                  const started = await stepCounter.start();
+                  setIsTrackingSteps(started);
+                }
+              }}
+            >
+              {isTrackingSteps ? "Stop" : "Start"}
+            </Button>
+          </div>
+        </div>
+      )}
+      
       {/* Weekly Summary */}
       <div className="px-5 py-4">
         <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
@@ -60,7 +237,7 @@ export default function Progress() {
             <Skeleton className="h-48 w-full mb-4" />
           ) : (
             <div className="h-48 mb-4">
-              <ActivityChart data={activities || []} period={period} />
+              <ActivityChart data={Array.isArray(activities) ? activities : [activities || {}]} period={period} />
             </div>
           )}
           
@@ -124,19 +301,19 @@ export default function Progress() {
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-full flex items-center justify-center mr-4",
-                    workout.workout.category === "strength" ? "bg-primary/10" : 
-                    workout.workout.category === "cardio" ? "bg-secondary/10" : 
+                    workout.workout?.category === "strength" ? "bg-primary/10" : 
+                    workout.workout?.category === "cardio" ? "bg-secondary/10" : 
                     "bg-accent/10"
                   )}>
                     <i className={cn(
-                      workout.workout.category === "strength" ? "fas fa-dumbbell text-primary" : 
-                      workout.workout.category === "cardio" ? "fas fa-running text-secondary" : 
+                      workout.workout?.category === "strength" ? "fas fa-dumbbell text-primary" : 
+                      workout.workout?.category === "cardio" ? "fas fa-running text-secondary" : 
                       "fas fa-heartbeat text-accent"
                     )}></i>
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between">
-                      <h3 className="font-medium">{workout.workout.name}</h3>
+                      <h3 className="font-medium">{workout.workout?.name || "Workout"}</h3>
                       <p className="text-xs text-gray-500">
                         {formatDistanceToNow(new Date(workout.date), { addSuffix: true })}
                       </p>

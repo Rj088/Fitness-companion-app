@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'io.replit.fitness',
   appName: 'FitnessApp',
   webDir: 'dist/public',
-  bundledWebRuntime: false,
+
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
