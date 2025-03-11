@@ -9,6 +9,7 @@ import Progress from "@/pages/Progress";
 import Nutrition from "@/pages/Nutrition";
 import Profile from "@/pages/Profile";
 import AuthPage from "@/pages/auth-page";
+import DebugPage from "@/pages/debug";
 import TabBar from "@/components/TabBar";
 import StatusBar from "@/components/StatusBar";
 import { useAuth } from "./lib/context/AuthContext";
