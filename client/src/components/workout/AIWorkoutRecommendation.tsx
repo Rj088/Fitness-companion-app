@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { WorkoutCard } from "@/components/workout/WorkoutPlan";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { generateWorkoutRecommendation, parseWorkoutResponse } from "@/lib/xai";
+import { useToast } from "@/hooks/use-toast";
 
 interface AIWorkoutRecommendationProps {
   user?: User | null;
@@ -14,24 +16,62 @@ interface AIWorkoutRecommendationProps {
 
 export default function AIWorkoutRecommendation({ 
   user, 
-  aiWorkouts, 
+  aiWorkouts = [], 
   isLoading = false 
 }: AIWorkoutRecommendationProps) {
+  const { toast } = useToast();
   const [showGenerateForm, setShowGenerateForm] = useState(false);
   const [goals, setGoals] = useState("");
   const [injuries, setInjuries] = useState("");
   const [equipment, setEquipment] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedWorkout, setGeneratedWorkout] = useState<Workout | null>(null);
 
-  // This would be a real API call in a production app
-  const handleGenerateWorkoutPlan = () => {
+  // Call the xAI integration to generate a new workout
+  const handleGenerateWorkoutPlan = async () => {
+    if (!user) {
+      toast({
+        title: "User profile required",
+        description: "Please complete your profile to get personalized recommendations",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsGenerating(true);
-    // Simulate an API call delay
-    setTimeout(() => {
+    
+    try {
+      // Call the xAI integration to generate a workout plan
+      const workoutText = await generateWorkoutRecommendation(user, {
+        goals,
+        injuries,
+        equipment
+      });
+      
+      // Parse the generated text into a structured workout
+      const workout = parseWorkoutResponse(workoutText);
+      
+      // Store the generated workout 
+      setGeneratedWorkout(workout);
+      toast({
+        title: "Workout Generated",
+        description: "Your personalized workout plan is ready",
+      });
+    } catch (error) {
+      console.error("Error generating workout:", error);
+      toast({
+        title: "Generation Failed",
+        description: "Unable to generate a workout plan. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsGenerating(false);
       setShowGenerateForm(false);
-    }, 2000);
+    }
   };
+  
+  // Determine which workout to display
+  const displayWorkout = generatedWorkout || (aiWorkouts && aiWorkouts.length > 0 ? aiWorkouts[0] : null);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
@@ -113,12 +153,12 @@ export default function AIWorkoutRecommendation({
         </div>
       ) : isLoading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
-      ) : aiWorkouts && aiWorkouts.length > 0 ? (
+      ) : displayWorkout ? (
         <div>
           <p className="text-sm text-gray-500 mb-3">
-            Based on your {user?.fitnessLevel} fitness level and goals, we recommend:
+            Based on your {user?.fitnessLevel || 'current'} fitness level and goals, we recommend:
           </p>
-          <WorkoutCard workout={aiWorkouts[0]} />
+          <WorkoutCard workout={displayWorkout} />
         </div>
       ) : (
         <div className="text-center py-6">

@@ -115,6 +115,37 @@ export const WORKOUT_CATEGORIES = {
     color: 'text-accent', 
     bg: 'bg-accent/10',
     label: 'HIIT'
+  },
+  // New specialized categories
+  chest: { 
+    icon: 'fas fa-dumbbell', 
+    color: 'text-blue-600', 
+    bg: 'bg-blue-100',
+    label: 'Chest'
+  },
+  back: { 
+    icon: 'fas fa-dumbbell', 
+    color: 'text-indigo-600', 
+    bg: 'bg-indigo-100',
+    label: 'Back'
+  },
+  biceps: { 
+    icon: 'fas fa-dumbbell', 
+    color: 'text-purple-600', 
+    bg: 'bg-purple-100',
+    label: 'Biceps'
+  },
+  crossfit: { 
+    icon: 'fas fa-fire-alt', 
+    color: 'text-red-600', 
+    bg: 'bg-red-100',
+    label: 'CrossFit'
+  },
+  ai: { 
+    icon: 'fas fa-robot', 
+    color: 'text-blue-500', 
+    bg: 'bg-blue-100',
+    label: 'AI Generated'
   }
 };
 
