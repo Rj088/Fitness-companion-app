@@ -365,6 +365,97 @@ export class MemStorage implements IStorage {
         { id: 1, name: "Jogging", duration: 1680, description: "Steady state jogging at moderate pace" }
       ]
     });
+    
+    // Chest workout
+    const chestWorkout = this.createWorkout({
+      name: "Chest Crusher",
+      description: "Build a powerful chest with this focused workout routine",
+      imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&auto=format",
+      duration: 45,
+      caloriesBurned: 380,
+      difficulty: "intermediate",
+      category: "strength",
+      exercises: [
+        { id: 1, name: "Barbell Bench Press", sets: 4, reps: 8, description: "Flat bench press with barbell" },
+        { id: 2, name: "Incline Dumbbell Press", sets: 3, reps: 10, description: "Press on an inclined bench" },
+        { id: 3, name: "Dumbbell Flyes", sets: 3, reps: 12, description: "Chest flyes with dumbbells" },
+        { id: 4, name: "Push-ups", sets: 3, reps: 15, description: "Standard push-ups to failure" },
+        { id: 5, name: "Cable Crossovers", sets: 3, reps: 15, description: "Cable crossovers for chest definition" }
+      ]
+    });
+    
+    // Back workout
+    const backWorkout = this.createWorkout({
+      name: "Back Builder",
+      description: "Develop a strong and defined back with these pulling exercises",
+      imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=500&auto=format",
+      duration: 40,
+      caloriesBurned: 350,
+      difficulty: "intermediate",
+      category: "strength",
+      exercises: [
+        { id: 1, name: "Pull-ups", sets: 4, reps: 8, description: "Standard pull-ups" },
+        { id: 2, name: "Bent-over Rows", sets: 3, reps: 12, description: "Barbell rows" },
+        { id: 3, name: "Lat Pulldowns", sets: 3, reps: 12, description: "Wide-grip lat pulldowns" },
+        { id: 4, name: "Seated Cable Rows", sets: 3, reps: 12, description: "Seated cable row machine" },
+        { id: 5, name: "Single-arm Dumbbell Rows", sets: 3, reps: 10, description: "Dumbbell rows per arm" }
+      ]
+    });
+    
+    // Biceps workout
+    const bicepsWorkout = this.createWorkout({
+      name: "Biceps Blast",
+      description: "Sculpt your arms with this biceps-focused routine",
+      imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&auto=format",
+      duration: 35,
+      caloriesBurned: 280,
+      difficulty: "beginner",
+      category: "strength",
+      exercises: [
+        { id: 1, name: "Barbell Curls", sets: 3, reps: 12, description: "Standing barbell curls" },
+        { id: 2, name: "Hammer Curls", sets: 3, reps: 12, description: "Dumbbell hammer curls" },
+        { id: 3, name: "Incline Dumbbell Curls", sets: 3, reps: 10, description: "Curls on an incline bench" },
+        { id: 4, name: "Preacher Curls", sets: 3, reps: 10, description: "Barbell preacher curls" },
+        { id: 5, name: "Concentration Curls", sets: 2, reps: 15, description: "Seated concentration curls" }
+      ]
+    });
+    
+    // CrossFit workout
+    const crossfitWorkout = this.createWorkout({
+      name: "CrossFit Challenge",
+      description: "High-intensity CrossFit workout to test your limits",
+      imageUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=500&auto=format",
+      duration: 30,
+      caloriesBurned: 400,
+      difficulty: "advanced",
+      category: "hiit",
+      exercises: [
+        { id: 1, name: "Box Jumps", sets: 5, reps: 20, description: "Jump onto a plyo box" },
+        { id: 2, name: "Kettlebell Swings", sets: 5, reps: 15, description: "Two-handed kettlebell swings" },
+        { id: 3, name: "Wall Balls", sets: 5, reps: 20, description: "Squat and throw medicine ball" },
+        { id: 4, name: "Burpees", sets: 5, reps: 15, description: "Full burpees" },
+        { id: 5, name: "Double-unders", sets: 5, reps: 30, description: "Jump rope double unders" }
+      ]
+    });
+    
+    // AI Recommended workout
+    const aiRecommendedWorkout = this.createWorkout({
+      name: "AI Smart Workout",
+      description: "Personalized workout routine based on your fitness level and goals",
+      imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=500&auto=format",
+      duration: 45,
+      caloriesBurned: 320,
+      difficulty: "beginner",
+      category: "strength",
+      exercises: [
+        { id: 1, name: "Bodyweight Squats", sets: 3, reps: 15, description: "Basic squats to warm up" },
+        { id: 2, name: "Push-ups", sets: 3, reps: 10, description: "Standard push-ups" },
+        { id: 3, name: "Dumbbell Rows", sets: 3, reps: 12, description: "Single arm dumbbell rows" },
+        { id: 4, name: "Planks", sets: 3, duration: 30, description: "Core stabilization" },
+        { id: 5, name: "Walking Lunges", sets: 2, reps: 20, description: "10 steps each leg" },
+        { id: 6, name: "Glute Bridges", sets: 3, reps: 15, description: "Hip raises for glute activation" }
+      ]
+    });
 
     // Create sample foods
     const oatmeal = this.createFood({
