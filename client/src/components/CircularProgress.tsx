@@ -19,22 +19,28 @@ export default function CircularProgress({
   const circumference = radius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
   
+  // Fix for text-primary, text-secondary, etc. classes
+  const getStrokeColor = () => {
+    if (color === 'text-primary') return 'hsl(142.1, 76.2%, 36.3%)'; // green
+    if (color === 'text-secondary') return 'hsl(243.4, 75.4%, 58.6%)'; // blue
+    if (color === 'text-success') return 'hsl(20.5, 90.2%, 48.2%)'; // orange
+    return color; // Use directly if it's an hsl/rgb/hex value
+  };
+  
   return (
     <div className="w-16 h-16 mx-auto relative">
       <svg className="progress-ring" width={size} height={size}>
         <circle 
-          className="text-gray-200" 
           strokeWidth={strokeWidth} 
-          stroke="currentColor" 
+          stroke="#e5e7eb" // light gray
           fill="transparent" 
           r={radius} 
           cx={size / 2} 
           cy={size / 2}
         />
         <circle 
-          className={color} 
           strokeWidth={strokeWidth} 
-          stroke="currentColor" 
+          stroke={getStrokeColor()}
           fill="transparent" 
           r={radius} 
           cx={size / 2} 

@@ -79,8 +79,10 @@ export default function Home() {
               </>
             )}
           </div>
-          <div className="h-10 w-10 rounded-full bg-light flex items-center justify-center">
-            <i className="fas fa-user text-gray-400"></i>
+          <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <span className="font-medium text-gray-600">
+              {user?.firstName?.charAt(0) || 'U'}
+            </span>
           </div>
         </div>
       </div>
