@@ -11,6 +11,24 @@ import {
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
+
+// Helper function to hash passwords
+const scryptAsync = promisify(scrypt);
+
+async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
+}
+
+async function comparePasswords(supplied: string, stored: string) {
+  const [hashed, salt] = stored.split(".");
+  const hashedBuf = Buffer.from(hashed, "hex");
+  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+  return timingSafeEqual(hashedBuf, suppliedBuf);
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const router = express.Router();
@@ -44,6 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   router.post("/users", async (req, res) => {
     try {
+      const { password, ...otherUserData } = req.body;
       const userData = validateRequest(insertUserSchema, req.body);
       
       // Check if username already exists
@@ -52,10 +71,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already exists" });
       }
       
-      const user = await storage.createUser(userData);
+      // Hash password if it exists
+      let finalUserData = userData;
+      if (password) {
+        const hashedPassword = await hashPassword(password);
+        finalUserData = { ...userData, password: hashedPassword };
+      }
+      
+      const user = await storage.createUser(finalUserData);
       
       // Don't return the password
-      const { password, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -71,7 +97,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const updatedUser = await storage.updateUser(userId, req.body);
+      // If password is being updated, hash it
+      let updatedData = { ...req.body };
+      if (req.body.password) {
+        updatedData.password = await hashPassword(req.body.password);
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updatedData);
       
       // Don't return the password
       const { password, ...userWithoutPassword } = updatedUser!;
@@ -352,23 +384,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth routes (simplified version for MVP)
-  router.post("/auth/login", async (req, res) => {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+  // Auth routes with secure password comparison
+  router.post("/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+      
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      
+      // Secure password comparison
+      const passwordMatch = await comparePasswords(password, user.password);
+      
+      if (!passwordMatch) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      
+      // Don't return the password
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: `Login failed: ${error.message}` });
     }
-    
-    const user = await storage.getUserByUsername(username);
-    
-    if (!user || user.password !== password) {
-      return res.status(401).json({ message: "Invalid username or password" });
+  });
+  
+  // Registration route with password hashing
+  router.post("/register", async (req, res) => {
+    try {
+      const { username, password, ...userData } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Hash the password
+      const hashedPassword = await hashPassword(password);
+      
+      // Create the user with hashed password
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword,
+        ...userData,
+        fitnessLevel: userData.fitnessLevel || 'beginner',
+        dailyStepsGoal: userData.dailyStepsGoal || 8000,
+        workoutFrequency: userData.workoutFrequency || 3,
+      });
+      
+      // Don't return the password
+      const { password: _, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(400).json({ message: `Registration failed: ${error.message}` });
     }
-    
-    // Don't return the password
-    const { password: _, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
   });
 
   // Mount the router to /api

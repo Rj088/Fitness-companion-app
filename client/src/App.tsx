@@ -11,6 +11,7 @@ import Profile from "@/pages/Profile";
 import AuthPage from "@/pages/auth-page";
 import DebugPage from "@/pages/debug";
 import TestPage from "@/pages/test-page";
+import SimpleAuthPage from "@/pages/simpler-auth-page";
 import TabBar from "@/components/TabBar";
 import StatusBar from "@/components/StatusBar";
 import { useAuth } from "./lib/context/AuthContext";
@@ -34,6 +35,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
+      <Route path="/simple-auth" component={SimpleAuthPage} />
       <Route path="/debug" component={DebugPage} />
       <Route path="/test" component={TestPage} />
       <ProtectedRoute path="/" component={Home} />
