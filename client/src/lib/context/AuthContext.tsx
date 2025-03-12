@@ -46,12 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (userId) {
         try {
+          console.log("Checking auth for user ID:", userId);
           const response = await fetch(API_ENDPOINTS.USERS.GET(Number(userId)), {
             credentials: 'include',
           });
           
           if (response.ok) {
             const user = await response.json();
+            console.log("User auth check successful:", user);
             setState({
               isAuthenticated: true,
               user,
@@ -59,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               error: null,
             });
           } else {
+            console.log("User auth check failed, clearing stored data");
             // Clear invalid stored data
             localStorage.removeItem(STORAGE_KEYS.USER_ID);
             setState({
@@ -78,10 +81,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
         }
       } else {
-        setState({
-          ...state,
+        console.log("No stored user ID found, not authenticated");
+        setState(prevState => ({
+          ...prevState,
           loading: false,
-        });
+        }));
       }
     };
 
@@ -97,8 +101,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     try {
-      const response = await apiRequest('POST', API_ENDPOINTS.AUTH.LOGIN, credentials);
+      console.log("Attempting login with:", credentials);
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+      
       const user = await response.json();
+      console.log("Login successful, received user:", user);
       
       setState({
         isAuthenticated: true,
@@ -117,6 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
+      console.error("Login error:", error);
       setState({
         isAuthenticated: false,
         user: null,
@@ -143,8 +163,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     try {
-      const response = await apiRequest('POST', API_ENDPOINTS.AUTH.REGISTER, userData);
+      console.log("Attempting registration with:", userData);
+      const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+      
       const user = await response.json();
+      console.log("Registration successful, received user:", user);
       
       setState({
         isAuthenticated: true,
@@ -163,6 +198,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return true;
     } catch (error: any) {
+      console.error("Registration error:", error);
       setState({
         isAuthenticated: false,
         user: null,

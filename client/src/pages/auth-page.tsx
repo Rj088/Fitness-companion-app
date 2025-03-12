@@ -138,7 +138,12 @@ function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials)
   });
 
   async function handleSubmit(data: z.infer<typeof loginSchema>) {
-    await onSubmit(data);
+    try {
+      await onSubmit(data);
+      console.log("Login form submitted successfully");
+    } catch (error) {
+      console.error("Login submission error:", error);
+    }
   }
 
   return (
@@ -201,7 +206,12 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (data: RegisterData) 
   });
 
   async function handleSubmit(data: z.infer<typeof registerSchema>) {
-    await onSubmit(data);
+    try {
+      await onSubmit(data);
+      console.log("Registration form submitted successfully");
+    } catch (error) {
+      console.error("Registration submission error:", error);
+    }
   }
 
   return (
