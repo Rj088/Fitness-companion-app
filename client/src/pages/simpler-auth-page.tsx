@@ -66,8 +66,8 @@ export default function SimpleAuthPage() {
         description: `Welcome back, ${userData.firstName}!`,
       });
       
-      // Redirect to home page after login
-      navigate("/home");
+      // Navigate to the home page after login
+      window.location.href = "/home";
       
     } catch (err) {
       console.error("Login error:", err);
@@ -129,8 +129,8 @@ export default function SimpleAuthPage() {
         description: `Welcome, ${user.firstName}!`,
       });
       
-      // Redirect to home page after registration
-      navigate("/home");
+      // Navigate to the home page after registration
+      window.location.href = "/home";
       
     } catch (err) {
       console.error("Registration error:", err);
