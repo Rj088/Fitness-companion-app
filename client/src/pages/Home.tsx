@@ -19,19 +19,24 @@ export default function Home() {
     date: new Date().toISOString().split('T')[0] 
   });
 
+  // Get the activity data as a single record
+  const activity = Array.isArray(todayActivities) 
+    ? todayActivities[0] 
+    : todayActivities;
+    
   // Calculate steps percentage
-  const stepsPercentage = user && todayActivities 
-    ? Math.round((todayActivities.steps / user.dailyStepsGoal) * 100)
+  const stepsPercentage = user && activity 
+    ? Math.round((activity.steps / user.dailyStepsGoal) * 100)
     : 0;
 
   // Calculate calories percentage (assuming 800 calories burned daily goal)
-  const caloriesPercentage = todayActivities 
-    ? Math.round((todayActivities.caloriesBurned / 800) * 100)
+  const caloriesPercentage = activity 
+    ? Math.round((activity.caloriesBurned / 800) * 100)
     : 0;
 
   // Calculate active minutes percentage (assuming 50 minutes daily goal)
-  const activeMinutesPercentage = todayActivities
-    ? Math.round((todayActivities.activeMinutes / 50) * 100)
+  const activeMinutesPercentage = activity
+    ? Math.round((activity.activeMinutes / 50) * 100)
     : 0;
 
   // Calculate macros from meals
@@ -40,10 +45,12 @@ export default function Home() {
     
     return userMeals.reduce((acc, meal) => {
       const { food, servings } = meal;
-      acc.calories += food.calories * servings;
-      acc.protein += (food.protein || 0) * servings;
-      acc.carbs += (food.carbs || 0) * servings;
-      acc.fat += (food.fat || 0) * servings;
+      if (food) {
+        acc.calories += food.calories * servings;
+        acc.protein += (food.protein || 0) * servings;
+        acc.carbs += (food.carbs || 0) * servings;
+        acc.fat += (food.fat || 0) * servings;
+      }
       return acc;
     }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
   };
@@ -108,7 +115,7 @@ export default function Home() {
                   color="text-primary" 
                 />
                 <p className="text-xs mt-1 text-gray-500">Steps</p>
-                <p className="text-sm font-medium">{todayActivities?.steps.toLocaleString()}</p>
+                <p className="text-sm font-medium">{activity?.steps?.toLocaleString() || '0'}</p>
               </div>
               
               {/* Calories Progress */}
@@ -120,7 +127,7 @@ export default function Home() {
                   color="text-secondary" 
                 />
                 <p className="text-xs mt-1 text-gray-500">Calories</p>
-                <p className="text-sm font-medium">{todayActivities?.caloriesBurned}</p>
+                <p className="text-sm font-medium">{activity?.caloriesBurned || '0'}</p>
               </div>
               
               {/* Active Minutes Progress */}
@@ -132,7 +139,7 @@ export default function Home() {
                   color="text-success" 
                 />
                 <p className="text-xs mt-1 text-gray-500">Active Min</p>
-                <p className="text-sm font-medium">{todayActivities?.activeMinutes}</p>
+                <p className="text-sm font-medium">{activity?.activeMinutes || '0'}</p>
               </div>
             </div>
           )}
@@ -195,7 +202,7 @@ export default function Home() {
                   iconColor="text-yellow-500"
                   iconBg="bg-yellow-100"
                   title="Breakfast"
-                  subtitle={`${mealsByType.breakfast.map(m => m.food.name).join(', ')} • ${mealsByType.breakfast.reduce((sum, m) => sum + m.food.calories * m.servings, 0)} cal`}
+                  subtitle={`${mealsByType.breakfast.map(m => m.food?.name || 'Meal').join(', ')} • ${mealsByType.breakfast.reduce((sum, m) => sum + (m.food?.calories || 0) * m.servings, 0)} cal`}
                 />
               )}
               
@@ -205,7 +212,7 @@ export default function Home() {
                   iconColor="text-green-500"
                   iconBg="bg-green-100"
                   title="Lunch"
-                  subtitle={`${mealsByType.lunch.map(m => m.food.name).join(', ')} • ${mealsByType.lunch.reduce((sum, m) => sum + m.food.calories * m.servings, 0)} cal`}
+                  subtitle={`${mealsByType.lunch.map(m => m.food?.name || 'Meal').join(', ')} • ${mealsByType.lunch.reduce((sum, m) => sum + (m.food?.calories || 0) * m.servings, 0)} cal`}
                 />
               )}
               
@@ -215,7 +222,7 @@ export default function Home() {
                   iconColor="text-orange-500"
                   iconBg="bg-orange-100"
                   title="Snack"
-                  subtitle={`${mealsByType.snack.map(m => m.food.name).join(', ')} • ${mealsByType.snack.reduce((sum, m) => sum + m.food.calories * m.servings, 0)} cal`}
+                  subtitle={`${mealsByType.snack.map(m => m.food?.name || 'Meal').join(', ')} • ${mealsByType.snack.reduce((sum, m) => sum + (m.food?.calories || 0) * m.servings, 0)} cal`}
                 />
               )}
 
@@ -225,7 +232,7 @@ export default function Home() {
                   iconColor="text-red-500"
                   iconBg="bg-red-100"
                   title="Dinner"
-                  subtitle={`${mealsByType.dinner.map(m => m.food.name).join(', ')} • ${mealsByType.dinner.reduce((sum, m) => sum + m.food.calories * m.servings, 0)} cal`}
+                  subtitle={`${mealsByType.dinner.map(m => m.food?.name || 'Meal').join(', ')} • ${mealsByType.dinner.reduce((sum, m) => sum + (m.food?.calories || 0) * m.servings, 0)} cal`}
                 />
               )}
 
