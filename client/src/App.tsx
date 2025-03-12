@@ -34,11 +34,12 @@ function Router() {
 
   return (
     <Switch>
+      <Route path="/" component={SimpleAuthPage} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/simple-auth" component={SimpleAuthPage} />
       <Route path="/debug" component={DebugPage} />
       <Route path="/test" component={TestPage} />
-      <ProtectedRoute path="/" component={Home} />
+      <ProtectedRoute path="/home" component={Home} />
       <ProtectedRoute path="/workouts" component={Workouts} />
       <ProtectedRoute path="/progress" component={Progress} />
       <ProtectedRoute path="/nutrition" component={Nutrition} />
