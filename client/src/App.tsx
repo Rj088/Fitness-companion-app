@@ -10,6 +10,7 @@ import Nutrition from "@/pages/Nutrition";
 import Profile from "@/pages/Profile";
 import AuthPage from "@/pages/auth-page";
 import DebugPage from "@/pages/debug";
+import TestPage from "@/pages/test-page";
 import TabBar from "@/components/TabBar";
 import StatusBar from "@/components/StatusBar";
 import { useAuth } from "./lib/context/AuthContext";
@@ -34,6 +35,7 @@ function Router() {
     <Switch>
       <Route path="/auth" component={AuthPage} />
       <Route path="/debug" component={DebugPage} />
+      <Route path="/test" component={TestPage} />
       <ProtectedRoute path="/" component={Home} />
       <ProtectedRoute path="/workouts" component={Workouts} />
       <ProtectedRoute path="/progress" component={Progress} />
