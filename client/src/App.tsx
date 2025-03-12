@@ -22,23 +22,23 @@ function Router() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
   
-  // Redirect to home if not at one of the main tabs
-  useEffect(() => {
-    const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth", "/debug"];
-    if (isAuthenticated && !validRoutes.includes(location)) {
-      setLocation("/");
-    }
-  }, [location, isAuthenticated, setLocation]);
+  // For debugging, temporarily disabled routes redirect
+  // useEffect(() => {
+  //   const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth", "/debug"];
+  //   if (isAuthenticated && !validRoutes.includes(location)) {
+  //     setLocation("/");
+  //   }
+  // }, [location, isAuthenticated, setLocation]);
 
   return (
     <Switch>
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/debug" component={DebugPage} />
       <ProtectedRoute path="/" component={Home} />
       <ProtectedRoute path="/workouts" component={Workouts} />
       <ProtectedRoute path="/progress" component={Progress} />
       <ProtectedRoute path="/nutrition" component={Nutrition} />
       <ProtectedRoute path="/profile" component={Profile} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/debug" component={DebugPage} />
       <Route component={NotFound} />
     </Switch>
   );

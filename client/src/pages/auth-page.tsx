@@ -42,16 +42,14 @@ export default function AuthPage() {
   const [location, setLocation] = useLocation();
   const { login, register, isAuthenticated, loading } = useAuth();
   
-  // Redirect if already logged in
-  useEffect(() => {
-    if (isAuthenticated) {
-      setLocation("/");
-    }
-  }, [isAuthenticated, setLocation]);
+  // Comment out redirect for debugging
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     setLocation("/");
+  //   }
+  // }, [isAuthenticated, setLocation]);
   
-  if (isAuthenticated) {
-    return null;
-  }
+  console.log("Auth page render state:", { isAuthenticated, loading });
 
   return (
     <div className="flex min-h-screen">
