@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from "@/lib/context/AuthContext";
 import { LoginCredentials, RegisterData } from "@/lib/types";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Login form schema
 const loginSchema = z.object({
@@ -40,16 +41,18 @@ const registerSchema = z.object({
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [location, setLocation] = useLocation();
-  const { login, register, isAuthenticated, loading } = useAuth();
+  const { login, register, isAuthenticated, loading, user } = useAuth();
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
   
-  // Comment out redirect for debugging
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     setLocation("/");
-  //   }
-  // }, [isAuthenticated, setLocation]);
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log("User is authenticated, redirecting to home");
+      setLocation("/");
+    }
+  }, [isAuthenticated, user, setLocation]);
   
-  console.log("Auth page render state:", { isAuthenticated, loading });
+  console.log("Auth page render state:", { isAuthenticated, loading, localLoading, user });
 
   return (
     <div className="flex min-h-screen">
@@ -129,20 +132,65 @@ export default function AuthPage() {
 }
 
 function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials) => Promise<boolean>, isLoading: boolean }) {
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
+  const { toast } = useToast();
+  const [_, setLocation] = useLocation();
+  
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: "sarah",
+      password: "password123",
     },
   });
 
   async function handleSubmit(data: z.infer<typeof loginSchema>) {
+    setLocalLoading(true);
+    
     try {
-      await onSubmit(data);
-      console.log("Login form submitted successfully");
+      console.log("Login form submitted with:", data);
+      
+      // Direct API call for login to ensure it works
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Login API error:", response.status, errorText);
+        throw new Error(errorText || "Login failed");
+      }
+      
+      const user = await response.json();
+      console.log("Login successful. User data:", user);
+      
+      // Store user ID in localStorage
+      localStorage.setItem('fittrack_user_id', user.id.toString());
+      
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${user.firstName}!`,
+      });
+      
+      // Redirect to home page
+      setLocation("/");
+      
+      return true;
     } catch (error) {
       console.error("Login submission error:", error);
+      toast({
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "Invalid username or password",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLocalLoading(false);
     }
   }
 
@@ -175,8 +223,8 @@ function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials)
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" className="w-full" disabled={localLoading}>
+          {localLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Signing in...
@@ -191,26 +239,71 @@ function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials)
 }
 
 function RegisterForm({ onSubmit, isLoading }: { onSubmit: (data: RegisterData) => Promise<boolean>, isLoading: boolean }) {
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
+  const { toast } = useToast();
+  const [_, setLocation] = useLocation();
+  
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      password: "",
-      firstName: "",
-      lastName: "",
+      username: "newuser",
+      password: "password123",
+      firstName: "New",
+      lastName: "User",
       fitnessLevel: "beginner",
-      weight: undefined,
-      height: undefined,
-      age: undefined,
+      weight: 70,
+      height: 175,
+      age: 25,
     },
   });
 
   async function handleSubmit(data: z.infer<typeof registerSchema>) {
+    setLocalLoading(true);
+    
     try {
-      await onSubmit(data);
-      console.log("Registration form submitted successfully");
+      console.log("Registration form submitted with:", data);
+      
+      // Direct API call for registration
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Registration API error:", response.status, errorText);
+        throw new Error(errorText || "Registration failed");
+      }
+      
+      const user = await response.json();
+      console.log("Registration successful. User data:", user);
+      
+      // Store user ID in localStorage
+      localStorage.setItem('fittrack_user_id', user.id.toString());
+      
+      toast({
+        title: "Registration successful",
+        description: `Welcome, ${user.firstName}!`,
+      });
+      
+      // Redirect to home page
+      setLocation("/");
+      
+      return true;
     } catch (error) {
       console.error("Registration submission error:", error);
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Could not create account",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLocalLoading(false);
     }
   }
 
@@ -355,8 +448,8 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (data: RegisterData) 
           />
         </div>
         
-        <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" className="w-full mt-6" disabled={localLoading}>
+          {localLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating account...
