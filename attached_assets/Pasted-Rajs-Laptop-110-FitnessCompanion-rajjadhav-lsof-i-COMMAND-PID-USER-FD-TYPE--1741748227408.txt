@@ -1,0 +1,24 @@
+Rajs-Laptop-110:FitnessCompanion rajjadhav$ lsof -i 
+COMMAND     PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+rapportd    982 rajjadhav    8u  IPv4 0x68b9d10b645a639b      0t0  TCP *:58212 (LISTEN)
+rapportd    982 rajjadhav    9u  IPv6 0x6d0588bc662b62fd      0t0  TCP *:58212 (LISTEN)
+identitys   995 rajjadhav   18u  IPv4 0x4816f0e3ebdd7655      0t0  UDP *:*
+identitys   995 rajjadhav   23u  IPv4 0xf1e11f6f76cb515f      0t0  UDP *:*
+identitys   995 rajjadhav   44u  IPv6 0xc82af5567076d3b9      0t0  TCP rajs-laptop-110.local:1024->[fe80:13::cb4a:5305:488:373a]:1024 (ESTABLISHED)
+identitys   995 rajjadhav   51u  IPv6 0x5d8119f41972e160      0t0  TCP rajs-laptop-110.local:cap->[fe80:13::cb4a:5305:488:373a]:blackjack (ESTABLISHED)
+identitys   995 rajjadhav   52u  IPv6 0x5d8119f41972e160      0t0  TCP rajs-laptop-110.local:cap->[fe80:13::cb4a:5305:488:373a]:blackjack (ESTABLISHED)
+sharingd   1030 rajjadhav    4u  IPv4  0x24c2d4a60376530      0t0  UDP *:*
+sharingd   1030 rajjadhav   10u  IPv6 0x3894016759e43f0e      0t0  UDP *:51288
+Google     8198 rajjadhav   23u  IPv4 0x6a5ce085304fca4e      0t0  TCP 10.201.243.151:58187->wn-in-f188.1e100.net:5228 (ESTABLISHED)
+MSTeams    8464 rajjadhav   25u  IPv4  0x27c6921551e88b0      0t0  TCP 10.201.243.151:50640->52.123.145.21:https (ESTABLISHED)
+MSTeams    8464 rajjadhav   52u  IPv6 0xbbb279459e4a6194      0t0  UDP *:50070
+MSTeams    8464 rajjadhav   61u  IPv4 0x9b4c4216c26f32fa      0t0  TCP 10.201.243.151:58249->52.112.120.233:https (ESTABLISHED)
+Microsoft  8483 rajjadhav   22u  IPv4 0xb77ca1d06ce4b6bd      0t0  TCP 10.201.243.151:58304->52.123.137.98:https (ESTABLISHED)
+Code\x20H 43163 rajjadhav   18u  IPv4 0x84c0e9902a8e2af2      0t0  TCP 10.201.243.151:58331->104.46.162.226:https (ESTABLISHED)
+ControlCe 44982 rajjadhav    8u  IPv4 0x1498e8e67dc2b841      0t0  TCP *:afs3-fileserver (LISTEN)
+ControlCe 44982 rajjadhav    9u  IPv6 0xeb5ed98789a1ed81      0t0  TCP *:afs3-fileserver (LISTEN)
+ControlCe 44982 rajjadhav   10u  IPv4 0x5d6360394108ebc2      0t0  TCP *:commplex-main (LISTEN)
+ControlCe 44982 rajjadhav   11u  IPv6 0x4fef206a6fdd1ef4      0t0  TCP *:commplex-main (LISTEN)
+configd_s 46313 rajjadhav    8u  IPv4 0x639c46f4a0935119      0t0  UDP *:*
+eapolclie 50288 rajjadhav    3u  IPv4 0x22607b725f1031f6      0t0  UDP *:*
+siriactio 50429 rajjadhav    4u  IPv6 0x14e900d960ca3646      0t0  TCP *:58239 (LISTEN)
