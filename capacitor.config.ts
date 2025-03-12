@@ -1,18 +1,18 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.replit.fitness',
-  appName: 'FitnessApp',
+  appId: 'com.yourcompany.fitnesscompanion',
+  appName: 'Fitness Companion',
   webDir: 'dist/public',
 
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
-    hostname: 'app.replit.fitness',
-    cleartext: true
+    hostname: 'api.yourcompany.com', // Your production API server
+    cleartext: false // Set to false for production
   },
   ios: {
-    scheme: 'FitnessApp',
+    scheme: 'FitnessCompanion',
     contentInset: 'always',
     backgroundColor: '#ffffff',
     preferredContentMode: 'mobile',
