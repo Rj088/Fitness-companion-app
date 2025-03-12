@@ -32,18 +32,19 @@ function Router() {
   //   }
   // }, [location, isAuthenticated, setLocation]);
 
+  // Bypass authentication for demo purposes
   return (
     <Switch>
-      <Route path="/" component={SimpleAuthPage} />
+      <Route path="/" component={Home} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/simple-auth" component={SimpleAuthPage} />
       <Route path="/debug" component={DebugPage} />
       <Route path="/test" component={TestPage} />
-      <ProtectedRoute path="/home" component={Home} />
-      <ProtectedRoute path="/workouts" component={Workouts} />
-      <ProtectedRoute path="/progress" component={Progress} />
-      <ProtectedRoute path="/nutrition" component={Nutrition} />
-      <ProtectedRoute path="/profile" component={Profile} />
+      <Route path="/home" component={Home} />
+      <Route path="/workouts" component={Workouts} />
+      <Route path="/progress" component={Progress} />
+      <Route path="/nutrition" component={Nutrition} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -78,14 +79,15 @@ function App() {
 
   const { isAuthenticated } = useAuth();
 
+  // Force show UI components for demo purposes
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-screen flex flex-col bg-gray-100">
-        {isAuthenticated && <StatusBar />}
-        <div className={`flex-1 overflow-y-auto ${isAuthenticated ? 'pb-24' : ''}`}>
+        <StatusBar />
+        <div className="flex-1 overflow-y-auto pb-24">
           <Router />
         </div>
-        {isAuthenticated && <TabBar />}
+        <TabBar />
       </div>
       <Toaster />
     </QueryClientProvider>
