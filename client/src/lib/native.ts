@@ -210,15 +210,11 @@ export function registerAppEventListeners(): void {
  */
 export async function initializeNativeCapabilities(): Promise<void> {
   try {
-    // Request permissions
-    await Camera.requestPermissions();
-    await Geolocation.requestPermissions();
-    await LocalNotifications.requestPermissions();
-    
-    // Register app event listeners
+    // Don't automatically request permissions on startup
+    // Only register app event listeners
     registerAppEventListeners();
     
-    console.log('Native capabilities initialized');
+    console.log('Native capabilities initialized without requesting permissions');
   } catch (error) {
     console.error('Error initializing native capabilities:', error);
   }
