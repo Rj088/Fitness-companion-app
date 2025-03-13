@@ -60,15 +60,17 @@ export default function SimpleAuth() {
       // Store user ID in localStorage for persistence
       localStorage.setItem("fittrack_user_id", userData.id.toString());
       
-      // Update auth context
-      authLogin(userData);
+      // Update auth context with successful login
+      const success = await authLogin({ username, password });
+      console.log("Auth context updated:", success);
       
       toast({
         title: "Login successful",
         description: `Welcome back, ${userData.firstName}!`
       });
       
-      navigate("/");
+      // Force navigation to home page
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error instanceof Error ? error.message : "An unexpected error occurred");
@@ -123,14 +125,16 @@ export default function SimpleAuth() {
       localStorage.setItem("fittrack_user_id", newUser.id.toString());
       
       // Update auth context
-      authRegister(newUser);
+      const success = await authRegister(userData);
+      console.log("Auth context updated after registration:", success);
       
       toast({
         title: "Registration successful",
         description: `Welcome, ${newUser.firstName}!`
       });
       
-      navigate("/");
+      // Force navigation to home page
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Registration error:", error);
       setError(error instanceof Error ? error.message : "An unexpected error occurred");

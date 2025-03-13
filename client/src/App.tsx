@@ -48,24 +48,43 @@ function App() {
 
 function Router() {
   const [location, setLocation] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   // Redirect unauthenticated users to login page
   useEffect(() => {
     const publicRoutes = ["/auth", "/debug"];
 
-    if (!isAuthenticated && !publicRoutes.includes(location)) {
+    if (!loading && !isAuthenticated && !publicRoutes.includes(location)) {
+      console.log("Redirecting to auth page - not authenticated, current location:", location);
       setLocation("/auth");
     }
-  }, [isAuthenticated, location, setLocation]);
+    
+    if (!loading && isAuthenticated && location === "/auth") {
+      console.log("Redirecting to home page - already authenticated");
+      setLocation("/");
+    }
+  }, [isAuthenticated, loading, location, setLocation]);
+
+  // Show authenticated components only when authenticated
+  const renderProtectedComponent = (Component: React.ComponentType): JSX.Element => {
+    if (loading) {
+      return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    }
+    
+    if (!isAuthenticated) {
+      return <SimpleAuth />;
+    }
+    
+    return <Component />;
+  };
 
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/nutrition" component={Nutrition} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/profile" component={Profile} />
+      <Route path="/" component={() => renderProtectedComponent(Home)} />
+      <Route path="/workouts" component={() => renderProtectedComponent(Workouts)} />
+      <Route path="/nutrition" component={() => renderProtectedComponent(Nutrition)} />
+      <Route path="/progress" component={() => renderProtectedComponent(Progress)} />
+      <Route path="/profile" component={() => renderProtectedComponent(Profile)} />
       <Route path="/auth" component={SimpleAuth} />
       <Route path="/debug" component={Debug} />
       <Route component={NotFound} />
