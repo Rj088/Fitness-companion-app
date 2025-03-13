@@ -65,5 +65,7 @@
         <true/>
         <key>UIStatusBarStyle</key>
         <string>UIStatusBarStyleLightContent</string>
+<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to upload profile pictures and workout images.</string>
 </dict>
 </plist>
