@@ -1,60 +1,13 @@
 import UIKit
 import Capacitor
-import AppTrackingTransparency
-import CoreMotion
-import HealthKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    private let healthStore = HKHealthStore()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-
-        // Request tracking permission
-        if #available(iOS 14.5, *) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                ATTrackingManager.requestTrackingAuthorization { status in
-                    // Handle tracking authorization status
-                }
-            }
-        }
-
-        // Request motion permission
-        if CMMotionActivityManager.isActivityAvailable() {
-            let motionManager = CMMotionActivityManager()
-            let today = Date()
-            motionManager.queryActivityStarting(from: today, to: today, to: OperationQueue.main) { activities, error in
-                // Just a query to prompt for permission
-                motionManager.stopActivityUpdates()
-            }
-        }
-
-        // Request health permission if available
-        if HKHealthStore.isHealthDataAvailable() {
-            let typesToRead = Set([
-                HKObjectType.quantityType(forIdentifier: .stepCount)!,
-                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
-            ])
-
-            let typesToWrite = Set([
-                HKObjectType.quantityType(forIdentifier: .stepCount)!
-            ])
-
-            healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
-                if let error = error {
-                    print("Health authorization error: \(error.localizedDescription)")
-                } else if success {
-                    print("Health authorization successful")
-                } else {
-                    print("Health authorization denied")
-                }
-            }
-        }
-
         return true
     }
 
