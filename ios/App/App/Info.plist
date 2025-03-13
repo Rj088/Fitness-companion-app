@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -17,25 +18,24 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
+	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.getcapacitor.capacitor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>capacitor</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
-	<key>NSMotionUsageDescription</key>
-	<string>This app requires motion data to track your physical activity and provide fitness insights.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>This app needs access to your health data to track your fitness progress and provide personalized insights.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>This app needs permission to save workout data to your Health app to keep all your fitness information in one place.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to track outdoor activities like running and walking.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app uses your location to track outdoor activities even when the app is in the background.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This information is used to deliver personalized fitness experiences and help improve the app.</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -59,6 +59,18 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>We need camera access to let you take photos of your workouts and meals.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to track your outdoor workouts and calculate distance.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to track your outdoor workouts and calculate distance even when the app is in the background.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>We need to access motion and fitness data to track your steps and activities.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>We need access to your health data to track your fitness progress and show you insights about your activities.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>We need to update your health data to record workouts and activities from our app.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized fitness recommendations.</string>
 	<key>UIRequiresPersistentWiFi</key>
 	<true/>
 </dict>
