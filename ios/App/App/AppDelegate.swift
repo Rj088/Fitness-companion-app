@@ -2,12 +2,33 @@ import UIKit
 import Capacitor
 
 @UIApplicationMain
+import AppTrackingTransparency
+import CoreMotion
+
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Request permissions early to avoid crashes
+        if #available(iOS 14.5, *) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                // Handle tracking permission status
+            }
+        }
+        
+        // Request motion permission
+        if CMMotionActivityManager.isActivityAvailable() {
+            let motionManager = CMMotionActivityManager()
+            let today = Date()
+            motionManager.queryActivityStarting(from: today, to: today, to: .main) { activities, error in
+                // Just a query to prompt for permission
+                motionManager.stopActivityUpdates()
+            }
+        }
+        
         return true
     }
 
