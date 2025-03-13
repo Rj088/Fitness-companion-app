@@ -1,8 +1,8 @@
 // API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/users'
+    LOGIN: '/api/login',
+    REGISTER: '/api/register'
   },
   USERS: {
     GET: (id: number) => `/api/users/${id}`,

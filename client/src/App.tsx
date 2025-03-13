@@ -10,11 +10,11 @@ import Nutrition from "@/pages/Nutrition";
 import Progress from "@/pages/Progress";
 import Profile from "@/pages/Profile";
 import SimpleAuth from "@/pages/SimpleAuth";
-import { setupNative } from "@/lib/native";
+import { initializeNativeCapabilities } from "@/lib/native";
 import { useAuth } from "@/lib/context/AuthContext";
 import StatusBar from "@/components/StatusBar";
 import TabBar from "@/components/TabBar";
-import Debug from "@/pages/Debug";
+import Debug from "@/pages/debug";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -24,14 +24,13 @@ function App() {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    setupNative({
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+    // Initialize native capabilities
+    initializeNativeCapabilities().catch((error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     });
   }, [toast]);
 
