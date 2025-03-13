@@ -46,6 +46,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to allow you to select workout progress photos and profile pictures.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to take fitness progress photos and update your profile picture.</string>
 	
 	<!-- Camera permissions -->
 	<key>NSCameraUsageDescription</key>
