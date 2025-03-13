@@ -69,5 +69,13 @@
 	<string>This app requires access to your photo library to upload profile pictures and workout images.</string>
 <key>NSUserTrackingUsageDescription</key>
 	<string>This app needs to track your activity across other companies' apps and websites to provide you with a personalized fitness experience.</string>
+<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to take profile pictures and workout progress photos.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires your location to track outdoor workouts and activities.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires background location access to track your outdoor fitness activities even when the app is not in use.</string>
+<key>NSMotionUsageDescription</key>
+	<string>This app requires motion and fitness data to count steps and detect workout activities.</string>
 </dict>
 </plist>
