@@ -27,6 +27,12 @@
 	<string>LaunchScreen</string>
 	<key>NSMotionUsageDescription</key>
 	<string>This app requires motion data to track your physical activity and provide fitness insights.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>This app requires access to your health data to track your fitness progress.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>This app requires permission to write health data to track your workouts and progress.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location to track outdoor activities like running and walking.</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
