@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, Workout } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateWorkoutRecommendation, parseWorkoutResponse } from "@/lib/xai";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AIWorkoutRecommendationProps {
   user?: User | null;
@@ -26,9 +29,8 @@ export default function AIWorkoutRecommendation({
   const [equipment, setEquipment] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedWorkout, setGeneratedWorkout] = useState<Workout | null>(null);
-
-  // Call the xAI integration to generate a new workout
-  const handleGenerateWorkoutPlan = async () => {
+  
+  const generateWorkout = async () => {
     if (!user) {
       toast({
         title: "User profile required",
@@ -41,21 +43,18 @@ export default function AIWorkoutRecommendation({
     setIsGenerating(true);
     
     try {
-      // Call the xAI integration to generate a workout plan
-      const workoutText = await generateWorkoutRecommendation(user, {
+      const response = await generateWorkoutRecommendation(user, {
         goals,
         injuries,
         equipment
       });
       
-      // Parse the generated text into a structured workout
-      const workout = parseWorkoutResponse(workoutText);
-      
-      // Store the generated workout 
+      const workout = parseWorkoutResponse(response);
       setGeneratedWorkout(workout);
+      
       toast({
         title: "Workout Generated",
-        description: "Your personalized workout plan is ready",
+        description: "Your personalized workout plan is ready"
       });
     } catch (error) {
       console.error("Error generating workout:", error);
@@ -70,104 +69,127 @@ export default function AIWorkoutRecommendation({
     }
   };
   
-  // Determine which workout to display
   const displayWorkout = generatedWorkout || (aiWorkouts && aiWorkouts.length > 0 ? aiWorkouts[0] : null);
-
+  
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-            <i className="fas fa-robot text-blue-500"></i>
+    <Card className="bg-white rounded-2xl shadow-sm p-0 mb-6 overflow-hidden border-0">
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3">
+              <i className="fas fa-robot text-white"></i>
+            </div>
+            <CardTitle className="text-xl font-semibold">AI Workout Recommendation</CardTitle>
           </div>
-          <h3 className="font-medium">AI Workout Recommendation</h3>
+          {!showGenerateForm && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:bg-white/20"
+              onClick={() => setShowGenerateForm(true)}
+            >
+              <i className="fas fa-plus mr-2"></i>
+              New Workout
+            </Button>
+          )}
         </div>
-        {!showGenerateForm && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-primary"
-            onClick={() => setShowGenerateForm(true)}
-          >
-            <i className="fas fa-sync-alt mr-1"></i> Generate New
-          </Button>
-        )}
-      </div>
-
-      {showGenerateForm ? (
-        <div className="p-3 bg-gray-50 rounded-xl">
-          <h4 className="font-medium text-sm mb-2">Customize your AI workout</h4>
-          <div className="space-y-3 mb-3">
+      </CardHeader>
+      
+      <CardContent className="p-4">
+        {showGenerateForm ? (
+          <div className="space-y-4 py-2">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Your fitness goals</label>
-              <Input
+              <Label htmlFor="goals" className="text-sm font-medium mb-1 block">What are your fitness goals?</Label>
+              <Textarea 
+                id="goals"
+                placeholder="e.g., lose weight, build muscle, improve endurance"
                 value={goals}
                 onChange={(e) => setGoals(e.target.value)}
-                placeholder="e.g., Build muscle, lose weight, improve endurance"
-                className="text-sm"
+                className="resize-none"
               />
             </div>
+            
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Any injuries or limitations?</label>
-              <Input
+              <Label htmlFor="injuries" className="text-sm font-medium mb-1 block">Any injuries or limitations?</Label>
+              <Textarea 
+                id="injuries"
+                placeholder="e.g., knee pain, shoulder injury, or 'none'"
                 value={injuries}
                 onChange={(e) => setInjuries(e.target.value)}
-                placeholder="e.g., Shoulder pain, knee issues"
-                className="text-sm"
+                className="resize-none"
               />
             </div>
+            
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Available equipment</label>
-              <Textarea
+              <Label htmlFor="equipment" className="text-sm font-medium mb-1 block">Available equipment</Label>
+              <Textarea 
+                id="equipment"
+                placeholder="e.g., dumbbells, resistance bands, or 'minimal equipment'"
                 value={equipment}
                 onChange={(e) => setEquipment(e.target.value)}
-                placeholder="e.g., Dumbbells, resistance bands, bench"
-                className="text-sm"
-                rows={2}
+                className="resize-none"
               />
             </div>
+            
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button
+                variant="primary"
+                onClick={generateWorkout}
+                disabled={isGenerating}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                {isGenerating ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-wand-magic-sparkles mr-2"></i>
+                    Generate Workout Plan
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowGenerateForm(false)}
+                disabled={isGenerating}
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              onClick={handleGenerateWorkoutPlan}
-              className="flex-1"
-              disabled={isGenerating}
+        ) : isLoading ? (
+          <div className="p-4">
+            <Skeleton className="h-14 w-full mb-4 rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+          </div>
+        ) : displayWorkout ? (
+          <div>
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <p className="text-sm text-blue-700">
+                <i className="fas fa-lightbulb mr-2"></i>
+                Based on your {user?.fitnessLevel || 'current'} fitness level and goals, we recommend:
+              </p>
+            </div>
+            <WorkoutCard workout={displayWorkout} />
+          </div>
+        ) : (
+          <div className="text-center py-10">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="fas fa-dumbbell text-blue-500 text-xl"></i>
+            </div>
+            <p className="text-gray-600 mb-4">No AI recommendations available yet</p>
+            <Button 
+              onClick={() => setShowGenerateForm(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              {isGenerating ? (
-                <>
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
-                  Generating...
-                </>
-              ) : (
-                "Generate Workout Plan"
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowGenerateForm(false)}
-              disabled={isGenerating}
-            >
-              Cancel
+              <i className="fas fa-wand-magic-sparkles mr-2"></i>
+              Generate Your First Workout
             </Button>
           </div>
-        </div>
-      ) : isLoading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
-      ) : displayWorkout ? (
-        <div>
-          <p className="text-sm text-gray-500 mb-3">
-            Based on your {user?.fitnessLevel || 'current'} fitness level and goals, we recommend:
-          </p>
-          <WorkoutCard workout={displayWorkout} />
-        </div>
-      ) : (
-        <div className="text-center py-6">
-          <p className="text-gray-500 mb-3">No AI recommendations available yet</p>
-          <Button onClick={() => setShowGenerateForm(true)}>
-            Generate Your First Workout
-          </Button>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

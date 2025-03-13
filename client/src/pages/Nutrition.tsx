@@ -1,321 +1,256 @@
 import { useState } from "react";
-import { useUserMeals } from "@/lib/hooks/useNutrition";
-import { useUser } from "@/lib/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-
-interface FoodItemProps {
-  name: string;
-  servingSize: string;
-  calories: number;
-  icon: string;
-  iconColor: string;
-}
-
-const FoodItem = ({ name, servingSize, calories, icon, iconColor }: FoodItemProps) => (
-  <div className="flex items-center justify-between py-2">
-    <div className="flex items-center">
-      <div className="w-8 h-8 bg-gray-100 rounded-full mr-3 flex items-center justify-center overflow-hidden">
-        <i className={`${icon} ${iconColor} text-xs`}></i>
-      </div>
-      <div>
-        <p className="text-sm font-medium">{name}</p>
-        <p className="text-xs text-gray-500">{servingSize}</p>
-      </div>
-    </div>
-    <p className="text-sm">{calories} cal</p>
-  </div>
-);
-
-interface MealSectionProps {
-  title: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  time: string;
-  calories: number;
-  foods: {
-    id: number;
-    name: string;
-    servingSize: string;
-    calories: number;
-    icon: string;
-    iconColor: string;
-  }[]
-}
-
-const MealSection = ({ title, icon, iconColor, iconBg, time, calories, foods }: MealSectionProps) => (
-  <div className="bg-white rounded-2xl shadow-sm mb-4">
-    <div className="flex items-center p-4 border-b border-gray-100">
-      <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center mr-3`}>
-        <i className={`${icon} ${iconColor}`}></i>
-      </div>
-      <div className="flex-1">
-        <div className="flex justify-between">
-          <h3 className="font-medium">{title}</h3>
-          <p className="text-sm text-gray-500">{calories} cal</p>
-        </div>
-        <p className="text-xs text-gray-500">{time}</p>
-      </div>
-      <button className="text-primary">
-        <i className="fas fa-plus"></i>
-      </button>
-    </div>
-    
-    <div className="p-4">
-      {foods.map((food) => (
-        <FoodItem
-          key={food.id}
-          name={food.name}
-          servingSize={food.servingSize}
-          calories={food.calories}
-          icon={food.icon}
-          iconColor={food.iconColor}
-        />
-      ))}
-    </div>
-  </div>
-);
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUser } from "@/lib/hooks/useUser";
+import { MealCard } from "@/components/nutrition/MealCard";
+import AINutritionRecommendation from "@/components/nutrition/AINutritionRecommendation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 export default function Nutrition() {
-  const { data: userMeals, isLoading: mealsLoading } = useUserMeals({ 
-    date: new Date().toISOString().split('T')[0] 
-  });
-  const { data: user } = useUser();
+  const [selectedDay, setSelectedDay] = useState(0);
+  const days = ["Today", "Yesterday", "Monday", "Sunday", "Saturday"];
+  const { user } = useUser();
+  const [waterGlasses, setWaterGlasses] = useState(5);
+  const waterGoal = 8;
 
-  // Group meals by type
-  const getMealsByType = () => {
-    if (!userMeals) return {};
-    
-    return userMeals.reduce((acc, meal) => {
-      const type = meal.mealType;
-      if (!acc[type]) {
-        acc[type] = {
-          foods: [],
-          totalCalories: 0,
-          time: getTimeForMealType(type)
-        };
-      }
-      
-      acc[type].foods.push({
-        id: meal.id,
-        name: meal.food.name,
-        servingSize: `${meal.servings} ${meal.food.servingSize || 'serving'}`,
-        calories: Math.round(meal.food.calories * meal.servings),
-        icon: getFoodIcon(meal.food.name),
-        iconColor: getFoodIconColor(meal.food.name)
-      });
-      
-      acc[type].totalCalories += Math.round(meal.food.calories * meal.servings);
-      return acc;
-    }, {} as Record<string, { foods: any[], totalCalories: number, time: string }>);
+  const breakfast = {
+    title: "Breakfast",
+    icon: "fas fa-coffee",
+    iconColor: "text-blue-500",
+    iconBg: "bg-blue-100",
+    time: "8:30 AM",
+    calories: 525,
+    foods: [
+      { id: 1, name: "Whole Grain Toast", servingSize: "2 slices", calories: 174, protein: 6, carbs: 30, fat: 2 },
+      { id: 2, name: "Scrambled Eggs", servingSize: "2 large eggs", calories: 182, protein: 13, carbs: 1, fat: 12 },
+      { id: 3, name: "Apple", servingSize: "1 medium", calories: 95, protein: 0.5, carbs: 25, fat: 0.3 }
+    ]
   };
 
-  // Calculate macros and total calories
-  const calculateNutrition = () => {
-    if (!userMeals) return { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    
-    return userMeals.reduce((acc, meal) => {
-      const { food, servings } = meal;
-      acc.calories += Math.round(food.calories * servings);
-      acc.protein += Math.round((food.protein || 0) * servings);
-      acc.carbs += Math.round((food.carbs || 0) * servings);
-      acc.fat += Math.round((food.fat || 0) * servings);
-      return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const lunch = {
+    title: "Lunch",
+    icon: "fas fa-utensils",
+    iconColor: "text-green-500",
+    iconBg: "bg-green-100",
+    time: "1:15 PM",
+    calories: 640,
+    foods: [
+      { id: 4, name: "Grilled Chicken Salad", servingSize: "1 bowl", calories: 320, protein: 30, carbs: 15, fat: 15 },
+      { id: 5, name: "Whole Grain Bread", servingSize: "1 slice", calories: 80, protein: 3, carbs: 15, fat: 1 },
+      { id: 6, name: "Greek Yogurt", servingSize: "1 small container", calories: 140, protein: 15, carbs: 8, fat: 4 },
+      { id: 7, name: "Banana", servingSize: "1 medium", calories: 100, protein: 1, carbs: 25, fat: 0.4 }
+    ]
   };
 
-  // Helper functions for meal display
-  const getTimeForMealType = (type: string): string => {
-    switch (type) {
-      case 'breakfast': return '7:30 AM';
-      case 'lunch': return '12:30 PM';
-      case 'dinner': return '6:30 PM';
-      case 'snack': return '3:30 PM';
-      default: return '';
+  const dinner = {
+    title: "Dinner",
+    icon: "fas fa-hamburger",
+    iconColor: "text-purple-500",
+    iconBg: "bg-purple-100",
+    time: "7:30 PM",
+    calories: 675,
+    foods: [
+      { id: 8, name: "Salmon Fillet", servingSize: "5 oz", calories: 280, protein: 35, carbs: 0, fat: 12 },
+      { id: 9, name: "Brown Rice", servingSize: "1 cup", calories: 215, protein: 5, carbs: 45, fat: 2 },
+      { id: 10, name: "Steamed Broccoli", servingSize: "1 cup", calories: 55, protein: 4, carbs: 10, fat: 0.5 },
+      { id: 11, name: "Olive Oil", servingSize: "1 tbsp", calories: 120, protein: 0, carbs: 0, fat: 14 }
+    ]
+  };
+
+  const addWaterGlass = () => {
+    if (waterGlasses < waterGoal) {
+      setWaterGlasses(waterGlasses + 1);
     }
   };
 
-  const getFoodIcon = (foodName: string): string => {
-    const foodName_lower = foodName.toLowerCase();
-    if (foodName_lower.includes('bread') || foodName_lower.includes('oatmeal')) return 'fas fa-bread-slice';
-    if (foodName_lower.includes('banana') || foodName_lower.includes('apple') || foodName_lower.includes('fruit')) return 'fas fa-apple-alt';
-    if (foodName_lower.includes('coffee')) return 'fas fa-mug-hot';
-    if (foodName_lower.includes('chicken') || foodName_lower.includes('meat')) return 'fas fa-drumstick-bite';
-    if (foodName_lower.includes('salad') || foodName_lower.includes('vegetable')) return 'fas fa-leaf';
-    if (foodName_lower.includes('oil') || foodName_lower.includes('dressing')) return 'fas fa-wine-bottle';
-    if (foodName_lower.includes('yogurt') || foodName_lower.includes('cheese')) return 'fas fa-cheese';
-    if (foodName_lower.includes('almond') || foodName_lower.includes('nuts')) return 'fas fa-seedling';
-    return 'fas fa-utensils';
-  };
+  const totalCalories = breakfast.calories + lunch.calories + dinner.calories;
+  const goalCalories = 2200;
+  const caloriePercentage = Math.min(Math.round((totalCalories / goalCalories) * 100), 100);
 
-  const getFoodIconColor = (foodName: string): string => {
-    const foodName_lower = foodName.toLowerCase();
-    if (foodName_lower.includes('bread') || foodName_lower.includes('oatmeal')) return 'text-yellow-700';
-    if (foodName_lower.includes('banana') || foodName_lower.includes('apple') || foodName_lower.includes('fruit')) return 'text-red-500';
-    if (foodName_lower.includes('coffee')) return 'text-yellow-900';
-    if (foodName_lower.includes('chicken') || foodName_lower.includes('meat')) return 'text-yellow-700';
-    if (foodName_lower.includes('salad') || foodName_lower.includes('vegetable')) return 'text-green-500';
-    if (foodName_lower.includes('oil') || foodName_lower.includes('dressing')) return 'text-green-700';
-    if (foodName_lower.includes('yogurt') || foodName_lower.includes('cheese')) return 'text-yellow-400';
-    if (foodName_lower.includes('almond') || foodName_lower.includes('nuts')) return 'text-green-800';
-    return 'text-gray-600';
-  };
+  // Calculate total macros
+  const totalProtein = [...breakfast.foods, ...lunch.foods, ...dinner.foods].reduce((sum, food) => sum + food.protein, 0);
+  const totalCarbs = [...breakfast.foods, ...lunch.foods, ...dinner.foods].reduce((sum, food) => sum + food.carbs, 0);
+  const totalFat = [...breakfast.foods, ...lunch.foods, ...dinner.foods].reduce((sum, food) => sum + food.fat, 0);
 
-  const mealsByType = getMealsByType();
-  const nutrition = calculateNutrition();
-  const calorieGoal = user?.dailyCalorieGoal || 2000;
-  const caloriePercentage = Math.round((nutrition.calories / calorieGoal) * 100);
+  // Goals
+  const proteinGoal = 130;
+  const carbsGoal = 275;
+  const fatGoal = 73;
+
+  const proteinPercentage = Math.min(Math.round((totalProtein / proteinGoal) * 100), 100);
+  const carbsPercentage = Math.min(Math.round((totalCarbs / carbsGoal) * 100), 100);
+  const fatPercentage = Math.min(Math.round((totalFat / fatGoal) * 100), 100);
 
   return (
-    <div id="nutrition-screen" className="bg-white pb-24">
-      {/* Header */}
-      <div className="px-5 pt-6 pb-4 bg-white">
-        <div className="flex justify-between items-center">
+    <div id="nutrition-screen" className="bg-white pb-32">
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold">Nutrition</h1>
-          <button className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-            <i className="fas fa-plus"></i>
-          </button>
-        </div>
-      </div>
-      
-      {/* Today's Summary */}
-      <div className="px-5 py-4">
-        <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
-          <h2 className="text-lg font-medium mb-3">Daily Summary</h2>
-          
-          {mealsLoading ? (
-            <Skeleton className="h-40 w-40 rounded-full mx-auto mb-4" />
-          ) : (
-            <div className="flex justify-center mb-4">
-              <div className="w-40 h-40 relative">
-                <svg className="w-full h-full">
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
-                    fill="none"
-                    stroke="#E2E8F0"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
-                    fill="none"
-                    stroke="#3182CE"
-                    strokeWidth="10"
-                    strokeDasharray="440"
-                    strokeDashoffset={440 - (440 * caloriePercentage / 100)}
-                    transform="rotate(-90 80 80)"
-                  />
-                  <text x="80" y="75" textAnchor="middle" className="text-2xl font-bold">{nutrition.calories}</text>
-                  <text x="80" y="95" textAnchor="middle" className="text-xs text-gray-500">of {calorieGoal} cal</text>
-                </svg>
-              </div>
-            </div>
-          )}
-          
-          {mealsLoading ? (
-            <Skeleton className="h-20 w-full mb-4" />
-          ) : (
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              <div className="text-center p-2 rounded-lg bg-blue-50">
-                <p className="text-xs text-gray-500">Carbs</p>
-                <p className="font-semibold">{nutrition.carbs}g</p>
-                <p className="text-xs text-gray-500">70%</p>
-              </div>
-              <div className="text-center p-2 rounded-lg bg-red-50">
-                <p className="text-xs text-gray-500">Protein</p>
-                <p className="font-semibold">{nutrition.protein}g</p>
-                <p className="text-xs text-gray-500">72%</p>
-              </div>
-              <div className="text-center p-2 rounded-lg bg-yellow-50">
-                <p className="text-xs text-gray-500">Fats</p>
-                <p className="font-semibold">{nutrition.fat}g</p>
-                <p className="text-xs text-gray-500">58%</p>
-              </div>
-            </div>
-          )}
-          
-          <Button className="w-full">
-            Add Food
+          <Button variant="outline" size="icon" className="w-10 h-10 rounded-full">
+            <i className="fas fa-plus text-gray-500"></i>
           </Button>
         </div>
-      </div>
-      
-      {/* Today's Meals */}
-      <div className="px-5 py-2">
-        <h2 className="text-lg font-medium mb-3">Today's Meals</h2>
-        
-        {mealsLoading ? (
-          <>
-            <Skeleton className="h-40 w-full mb-4 rounded-2xl" />
-            <Skeleton className="h-40 w-full mb-4 rounded-2xl" />
-          </>
-        ) : (
-          <>
-            {/* Breakfast */}
-            {mealsByType.breakfast && (
-              <MealSection
-                title="Breakfast"
-                icon="fas fa-coffee"
-                iconColor="text-yellow-500"
-                iconBg="bg-yellow-100"
-                time={mealsByType.breakfast.time}
-                calories={mealsByType.breakfast.totalCalories}
-                foods={mealsByType.breakfast.foods}
-              />
-            )}
-            
-            {/* Lunch */}
-            {mealsByType.lunch && (
-              <MealSection
-                title="Lunch"
-                icon="fas fa-utensils"
-                iconColor="text-green-500"
-                iconBg="bg-green-100"
-                time={mealsByType.lunch.time}
-                calories={mealsByType.lunch.totalCalories}
-                foods={mealsByType.lunch.foods}
-              />
-            )}
-            
-            {/* Snack */}
-            {mealsByType.snack && (
-              <MealSection
-                title="Snack"
-                icon="fas fa-apple-alt"
-                iconColor="text-orange-500"
-                iconBg="bg-orange-100"
-                time={mealsByType.snack.time}
-                calories={mealsByType.snack.totalCalories}
-                foods={mealsByType.snack.foods}
-              />
-            )}
-            
-            {/* Dinner */}
-            {mealsByType.dinner && (
-              <MealSection
-                title="Dinner"
-                icon="fas fa-drumstick-bite"
-                iconColor="text-red-500"
-                iconBg="bg-red-100"
-                time={mealsByType.dinner.time}
-                calories={mealsByType.dinner.totalCalories}
-                foods={mealsByType.dinner.foods}
-              />
-            )}
 
-            {(!userMeals || userMeals.length === 0) && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 text-center">
-                <p className="text-gray-500 mb-4">No meals logged today</p>
-                <Button>Add Your First Meal</Button>
+        <div className="flex space-x-3 overflow-x-auto py-1 mb-2 no-scrollbar">
+          {days.map((day, index) => (
+            <Button 
+              key={index}
+              variant={selectedDay === index ? "default" : "outline"}
+              className={`py-1.5 px-4 rounded-full text-sm whitespace-nowrap ${
+                selectedDay === index 
+                  ? "bg-primary text-white" 
+                  : "bg-light text-gray-500"
+              }`}
+              onClick={() => setSelectedDay(index)}
+            >
+              {day}
+            </Button>
+          ))}
+        </div>
+
+        <Card className="bg-light rounded-2xl shadow-sm border-0 p-4 mb-4">
+          <CardContent className="p-0">
+            <h3 className="text-sm font-medium mb-3">Daily Summary</h3>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <p className="text-xs text-gray-500">Calories</p>
+                <div className="flex items-baseline">
+                  <p className="text-2xl font-semibold">{totalCalories.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 ml-1">/ {goalCalories.toLocaleString()}</p>
+                </div>
               </div>
-            )}
-          </>
-        )}
+              <div className="w-16 h-16 rounded-full bg-white p-1">
+                <div className="w-full h-full rounded-full border-4 border-primary flex items-center justify-center relative">
+                  <div 
+                    className="absolute inset-0 rounded-full border-4 border-gray-200" 
+                    style={{ clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)` }}
+                  ></div>
+                  <div 
+                    className="absolute inset-0 rounded-full border-4 border-primary" 
+                    style={{ 
+                      clipPath: `polygon(0 0, ${caloriePercentage}% 0, ${caloriePercentage}% 100%, 0% 100%)`,
+                      transform: "rotate(-90deg)",
+                      transformOrigin: "center"
+                    }}
+                  ></div>
+                  <p className="font-semibold z-10">{caloriePercentage}%</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-xs text-gray-500">Proteins</p>
+                  <p className="text-xs text-gray-500">{Math.round(totalProtein)}g</p>
+                </div>
+                <Progress value={proteinPercentage} />
+              </div>
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-xs text-gray-500">Carbs</p>
+                  <p className="text-xs text-gray-500">{Math.round(totalCarbs)}g</p>
+                </div>
+                <Progress value={carbsPercentage} />
+              </div>
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-xs text-gray-500">Fat</p>
+                  <p className="text-xs text-gray-500">{Math.round(totalFat)}g</p>
+                </div>
+                <Progress value={fatPercentage} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="px-5">
+        <AINutritionRecommendation user={user} />
+
+        <Tabs defaultValue="meals">
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="meals">Meals</TabsTrigger>
+            <TabsTrigger value="water">Water</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="meals" className="space-y-4">
+            <MealCard {...breakfast} />
+            <MealCard {...lunch} />
+            <MealCard {...dinner} />
+          </TabsContent>
+
+          <TabsContent value="water">
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-4 mb-4">
+              <CardContent className="p-0">
+                <h3 className="font-medium mb-4">Water Tracker</h3>
+
+                <div className="flex justify-between items-center mb-6">
+                  <div className="text-center">
+                    <p className="text-xl font-bold">{waterGlasses}</p>
+                    <p className="text-xs text-gray-500">Current</p>
+                  </div>
+
+                  <div className="relative w-24 h-24">
+                    <div className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-blue-50 flex flex-col items-center justify-center">
+                        <i className="fas fa-tint text-blue-500 mb-1"></i>
+                        <p className="text-sm font-medium">{Math.round((waterGlasses / waterGoal) * 100)}%</p>
+                      </div>
+                    </div>
+                    <svg className="absolute -top-1 -left-1" width="100" height="100">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="48" 
+                        fill="none" 
+                        stroke="#3B82F6" 
+                        strokeWidth="4"
+                        strokeDasharray={`${(waterGlasses / waterGoal) * 300} 300`}
+                        strokeDashoffset="75"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
+
+                  <div className="text-center">
+                    <p className="text-xl font-bold">{waterGoal}</p>
+                    <p className="text-xs text-gray-500">Goal</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-8 gap-1 mb-4">
+                  {Array.from({ length: waterGoal }).map((_, index) => (
+                    <div 
+                      key={index} 
+                      className={`h-16 flex items-end ${index < waterGlasses ? 'opacity-100' : 'opacity-40'}`}
+                    >
+                      <div 
+                        className={`w-full h-12 ${index < waterGlasses ? 'bg-blue-400' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}
+                        style={{ 
+                          height: `${(12 - index % 3) * 8}px`,
+                          minHeight: '30px'
+                        }}
+                      >
+                        <i className={`fas fa-glass-water ${index < waterGlasses ? 'text-white' : 'text-blue-300'} text-xs`}></i>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button 
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={addWaterGlass}
+                  disabled={waterGlasses >= waterGoal}
+                >
+                  <i className="fas fa-plus mr-2"></i>
+                  Add Glass
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
