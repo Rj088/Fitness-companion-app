@@ -67,5 +67,7 @@
         <string>UIStatusBarStyleLightContent</string>
 <key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library to upload profile pictures and workout images.</string>
+<key>NSUserTrackingUsageDescription</key>
+	<string>This app needs to track your activity across other companies' apps and websites to provide you with a personalized fitness experience.</string>
 </dict>
 </plist>
