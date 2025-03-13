@@ -195,14 +195,41 @@ export async function scheduleWorkoutReminder(workoutName: string, scheduledTime
 /**
  * Register app lifecycle event listeners
  */
-export function registerAppEventListeners(): void {
-  App.addListener('appStateChange', ({ isActive }) => {
-    console.log('App state changed. Is active?', isActive);
-  });
-  
-  App.addListener('backButton', () => {
-    console.log('Back button pressed');
-  });
+function registerAppEventListeners(): void {
+  // Simple registration of event listeners without permission requests
+  try {
+    document.addEventListener('deviceready', onDeviceReady, false);
+    App.addListener('appStateChange', ({ isActive }) => {
+      console.log('App state changed. Is active?', isActive);
+    });
+    App.addListener('backButton', () => {
+      console.log('Back button pressed');
+    });
+  } catch (error) {
+    console.error('Error registering app event listeners:', error);
+  }
+}
+
+/**
+ * Handle device ready event
+ */
+function onDeviceReady(): void {
+  console.log('Device is ready - no permissions requested');
+}
+
+/**
+ * Request permission only when a specific feature is used
+ * @param permissionType The type of permission to request
+ */
+export async function requestPermission(permissionType: string): Promise<boolean> {
+  console.log(`Requesting permission for: ${permissionType}`);
+  try {
+    // Implementation would go here when needed
+    return true;
+  } catch (error) {
+    console.error(`Error requesting ${permissionType} permission:`, error);
+    return false;
+  }
 }
 
 /**
@@ -210,11 +237,12 @@ export function registerAppEventListeners(): void {
  */
 export async function initializeNativeCapabilities(): Promise<void> {
   try {
-    // Don't automatically request permissions on startup
-    // Only register app event listeners
+    // Don't request any permissions during initialization
+    // Only set up basic event listeners
+    console.log('Native capabilities initialized - permissions will be requested when needed');
+
     registerAppEventListeners();
-    
-    console.log('Native capabilities initialized without requesting permissions');
+
   } catch (error) {
     console.error('Error initializing native capabilities:', error);
   }

@@ -5,30 +5,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera access for workout photos.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need location access to track outdoor activities.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need location access to track outdoor activities.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>We need motion tracking for step counting.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>We need access to health data to track fitness progress.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>We need to update health data to record workouts.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photos to save workout images.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need to save workout photos to your library.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We need microphone access for voice commands.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Fitness Companion</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.replit.fitness</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -36,20 +18,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.getcapacitor.capacitor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>capacitor</string>
-			</array>
-		</dict>
-	</array>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -75,21 +46,43 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	
+	<!-- Camera permissions -->
 	<key>NSCameraUsageDescription</key>
-	<string>We need camera access to let you take photos of your workouts and meals.</string>
+	<string>This app requires camera access to take progress photos for your fitness journey</string>
+	
+	<!-- Location permissions -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to track your outdoor workouts and calculate distance.</string>
+	<string>This app requires location access to track your outdoor workouts and running routes</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need your location to track your outdoor workouts and calculate distance even when the app is in the background.</string>
+	<string>This app requires background location access to track your outdoor activities even when the app is in the background</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires always-on location access to track your fitness activities</string>
+	
+	<!-- Motion & Fitness permissions -->
 	<key>NSMotionUsageDescription</key>
-	<string>We need to access motion and fitness data to track your steps and activities.</string>
+	<string>This app requires motion and fitness tracking to count your steps and monitor physical activities</string>
+	
+	<!-- Health permissions -->
 	<key>NSHealthShareUsageDescription</key>
-	<string>We need access to your health data to track your fitness progress and show you insights about your activities.</string>
+	<string>This app requires access to your health data to provide personalized fitness recommendations</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>We need to update your health data to record workouts and activities from our app.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized fitness recommendations.</string>
-	<key>UIRequiresPersistentWiFi</key>
-	<true/>
+	<string>This app requires permission to save workout data to your Health app</string>
+	
+	<!-- Photo Library permissions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to save and load progress pictures</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app requires permission to save photos to your library</string>
+	
+	<!-- Microphone permissions -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires microphone access for voice commands during workouts</string>
+	
+	<!-- Bluetooth permissions -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app requires Bluetooth access to connect to fitness devices and heart rate monitors</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app requires Bluetooth access to connect to fitness devices</string>
 </dict>
 </plist>
