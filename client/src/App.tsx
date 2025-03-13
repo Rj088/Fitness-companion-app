@@ -1,6 +1,6 @@
 import { Switch, Route, useLocation } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"; // Added import
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -23,7 +23,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 function Router() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
-  
+
   // For debugging, temporarily disabled routes redirect
   // useEffect(() => {
   //   const validRoutes = ["/", "/workouts", "/progress", "/nutrition", "/profile", "/auth", "/debug"];
@@ -73,7 +73,7 @@ function App() {
         });
       }
     };
-    
+
     setupNative();
   }, [toast]);
 
@@ -81,17 +81,21 @@ function App() {
 
   // Force show UI components for demo purposes
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="h-screen flex flex-col bg-gray-100">
-        <StatusBar />
-        <div className="flex-1 overflow-y-auto pb-24">
-          <Router />
-        </div>
-        <TabBar />
+    <div className="h-screen flex flex-col bg-gray-100">
+      <StatusBar />
+      <div className="flex-1 overflow-y-auto pb-24">
+        <Router />
       </div>
+      <TabBar />
       <Toaster />
-    </QueryClientProvider>
+    </div>
   );
 }
 
-export default App;
+const queryClient = new QueryClient(); // Create QueryClient instance
+
+export default () => (
+  <QueryClientProvider client={queryClient}>
+    <App />
+  </QueryClientProvider>
+);
