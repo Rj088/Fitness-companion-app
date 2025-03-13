@@ -42,7 +42,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ])
             
             let typesToWrite = Set([
-                HKObjectType.quantityType(forIdentifier: .stepCount)!,
+                HKObjectType.quantityType(forIdentifier: .stepCount)!
+            ])
+            
+            let healthStore = HKHealthStore()
+            healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
+                if let error = error {
+                    print("HealthKit authorization error: \(error.localizedDescription)")
+                }
+            }
                 HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
                 HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
             ])
