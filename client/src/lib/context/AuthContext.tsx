@@ -43,14 +43,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-      
+
       if (userId) {
         try {
           console.log("Checking auth for user ID:", userId);
           const response = await fetch(API_ENDPOINTS.USERS.GET(Number(userId)), {
             credentials: 'include',
           });
-          
+
           if (response.ok) {
             const user = await response.json();
             console.log("User auth check successful:", user);
@@ -110,30 +110,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(credentials),
         credentials: 'include'
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
-      
+
       const user = await response.json();
       console.log("Login successful, received user:", user);
-      
+
       setState({
         isAuthenticated: true,
         user,
         loading: false,
         error: null,
       });
-      
+
       // Store user ID in localStorage
       localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
-      
+
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.firstName}!`,
       });
-      
+
       return true;
     } catch (error: any) {
       console.error("Login error:", error);
@@ -143,13 +143,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading: false,
         error: error.message || 'Login failed',
       });
-      
+
       toast({
         title: "Login failed",
         description: error.message || "Invalid username or password",
         variant: "destructive",
       });
-      
+
       return false;
     }
   };
@@ -172,30 +172,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(userData),
         credentials: 'include'
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-      
+
       const user = await response.json();
       console.log("Registration successful, received user:", user);
-      
+
       setState({
         isAuthenticated: true,
         user,
         loading: false,
         error: null,
       });
-      
+
       // Store user ID in localStorage
       localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
-      
+
       toast({
         title: "Registration successful",
         description: `Welcome, ${user.firstName}!`,
       });
-      
+
       return true;
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -205,13 +205,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading: false,
         error: error.message || 'Registration failed',
       });
-      
+
       toast({
         title: "Registration failed",
         description: error.message || "Could not create account",
         variant: "destructive",
       });
-      
+
       return false;
     }
   };
@@ -219,18 +219,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout function
   const logout = () => {
     localStorage.removeItem(STORAGE_KEYS.USER_ID);
-    
-    setState({
-      isAuthenticated: false,
-      user: null,
-      loading: false,
-      error: null,
-    });
-    
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
+    setState({ isAuthenticated: false, user: null, loading: false, error: null });
+    toast({ title: "Logged out", description: "You have been logged out successfully" });
+    window.location.href = "/auth"; // Redirect to auth page
   };
 
   // Auto-login is disabled in favor of the login page
