@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -5,11 +6,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>App</string>
+	<string>Fitness Companion</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>io.replit.fitness</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -45,17 +46,21 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to capture photos for your fitness profile and progress tracking.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires location access to track your outdoor activities and routes.</string>
+	<string>We need your location to track your outdoor workouts and calculate distance.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to track your outdoor workouts and calculate distance even when the app is in the background.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access to let you take photos of your workouts and meals.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>This app requires motion and fitness tracking to count steps and monitor physical activities.</string>
+	<string>We need to access motion and fitness data to track your steps and activities.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>This app requires access to health data to monitor your fitness progress and integrate with your health records.</string>
+	<string>We need access to your health data to track your fitness progress and show you insights about your activities.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>This app requires permission to write health data to save your workout sessions and activity information.</string>
+	<string>We need to update your health data to record workouts and activities from our app.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This app uses tracking data to provide personalized fitness recommendations and improve your experience.</string>
+	<string>This identifier will be used to deliver personalized fitness recommendations.</string>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
 </dict>
 </plist>

@@ -1,4 +1,3 @@
-
 import UIKit
 import Capacitor
 import AppTrackingTransparency
@@ -13,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
         // Request tracking permission
         if #available(iOS 14.5, *) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -22,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
-        
+
         // Request motion permission
         if CMMotionActivityManager.isActivityAvailable() {
             let motionManager = CMMotionActivityManager()
@@ -32,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 motionManager.stopActivityUpdates()
             }
         }
-        
+
         // Request health permission if available
         if HKHealthStore.isHealthDataAvailable() {
             let typesToRead = Set([
@@ -40,20 +39,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
                 HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
             ])
-            
+
             let typesToWrite = Set([
                 HKObjectType.quantityType(forIdentifier: .stepCount)!
             ])
-            
+
             healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
                 if let error = error {
-                    print("HealthKit authorization error: \(error.localizedDescription)")
+                    print("Health authorization error: \(error.localizedDescription)")
+                } else if success {
+                    print("Health authorization successful")
                 } else {
-                    print("HealthKit authorization successful")
+                    print("Health authorization denied")
                 }
             }
         }
-        
+
         return true
     }
 
