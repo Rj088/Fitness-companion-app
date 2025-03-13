@@ -111,6 +111,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
+import { LogOut } from "lucide-react";
 
 interface ProfileSettingProps {
   icon: string;
@@ -153,9 +155,11 @@ const ProfileSetting = ({
 export default function Profile() {
   const { data: user, isLoading } = useUser();
   const { logout } = useAuth();
+  const [_, navigate] = useLocation();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
   };
 
   const weightInLbs = user?.weight ? Math.round(user.weight * 2.20462) : 0;

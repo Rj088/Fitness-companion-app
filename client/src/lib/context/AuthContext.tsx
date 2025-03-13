@@ -11,7 +11,7 @@ interface AuthContextProps {
   loading: boolean;
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>; // Changed to Promise<void>
   register: (userData: any) => Promise<boolean>;
 }
 
@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   error: null,
   login: async () => false,
-  logout: () => {},
+  logout: async () => {}, // Changed to async
   register: async () => false,
 });
 
@@ -217,11 +217,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Logout function
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem(STORAGE_KEYS.USER_ID);
     setState({ isAuthenticated: false, user: null, loading: false, error: null });
     toast({ title: "Logged out", description: "You have been logged out successfully" });
     window.location.href = "/auth"; // Redirect to auth page
+
+    // Added server-side session clearing
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   // Auto-login is disabled in favor of the login page

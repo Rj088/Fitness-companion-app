@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/lib/context/AuthContext";
 
 export default function SimpleAuth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,7 @@ export default function SimpleAuth() {
   
   const [_, navigate] = useLocation();
   const { toast } = useToast();
+  const { login: authLogin, register: authRegister } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,43 +38,53 @@ export default function SimpleAuth() {
     setError(null);
     
     try {
+      console.log("Attempting login with:", { username, password });
+      
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
-        credentials: "include",
+        credentials: "include"
       });
       
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Login failed");
+        const errorText = await response.text();
+        console.error("Login error:", response.status, errorText);
+        setError(errorText || "Login failed");
+        return;
       }
       
       const userData = await response.json();
+      console.log("Login successful:", userData);
+      
+      // Store user ID in localStorage for persistence
       localStorage.setItem("fittrack_user_id", userData.id.toString());
+      
+      // Update auth context
+      authLogin(userData);
       
       toast({
         title: "Login successful",
-        description: `Welcome back, ${userData.firstName}!`,
+        description: `Welcome back, ${userData.firstName}!`
       });
       
       navigate("/");
     } catch (error: any) {
-      setError(error.message || "Login failed");
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid username or password",
-        variant: "destructive",
-      });
+      console.error("Login error:", error);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!registerUsername || !registerPassword || !firstName) {
+      setError("Username, password, and first name are required");
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     
@@ -81,69 +93,80 @@ export default function SimpleAuth() {
         username: registerUsername,
         password: registerPassword,
         firstName,
-        lastName,
+        lastName: lastName || undefined,
         fitnessLevel,
         age: age ? parseInt(age) : undefined,
         weight: weight ? parseFloat(weight) : undefined,
-        height: height ? parseInt(height) : undefined,
+        height: height ? parseFloat(height) : undefined
       };
+      
+      console.log("Attempting registration with:", userData);
       
       const response = await fetch("/api/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
-        credentials: "include",
+        credentials: "include"
       });
       
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Registration failed");
+        const errorText = await response.text();
+        console.error("Registration error:", response.status, errorText);
+        setError(errorText || "Registration failed");
+        return;
       }
       
       const newUser = await response.json();
+      console.log("Registration successful:", newUser);
+      
+      // Store user ID in localStorage for persistence
       localStorage.setItem("fittrack_user_id", newUser.id.toString());
+      
+      // Update auth context
+      authRegister(newUser);
       
       toast({
         title: "Registration successful",
-        description: `Welcome, ${newUser.firstName}!`,
+        description: `Welcome, ${newUser.firstName}!`
       });
       
       navigate("/");
     } catch (error: any) {
-      setError(error.message || "Registration failed");
-      toast({
-        title: "Registration failed",
-        description: error.message || "Could not create account",
-        variant: "destructive",
-      });
+      console.error("Registration error:", error);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
   };
-
+  
+  const toggleMode = () => {
+    setActiveTab(activeTab === "login" ? "register" : "login");
+    setError(null);
+  };
+  
   return (
-    <div className="container flex items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">FitTrack</CardTitle>
-          <CardDescription>Your personal fitness companion</CardDescription>
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">FitTrack</CardTitle>
+          <CardDescription className="text-center">
+            {activeTab === "login" ? "Sign in to your account" : "Create a new account"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "register")}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
             
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 rounded-md p-3 my-4">
+                {error}
+              </div>
+            )}
+            
             <TabsContent value="login">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 rounded-md p-3 mb-4">
-                  {error}
-                </div>
-              )}
-              
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="username" className="block text-sm font-medium">
@@ -156,6 +179,7 @@ export default function SimpleAuth() {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your username"
                     disabled={isLoading}
+                    required
                   />
                 </div>
                 
@@ -170,6 +194,7 @@ export default function SimpleAuth() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     disabled={isLoading}
+                    required
                   />
                 </div>
                 
@@ -187,12 +212,6 @@ export default function SimpleAuth() {
             </TabsContent>
             
             <TabsContent value="register">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 rounded-md p-3 mb-4">
-                  {error}
-                </div>
-              )}
-              
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -204,12 +223,11 @@ export default function SimpleAuth() {
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="John"
+                      placeholder="Enter your first name"
                       disabled={isLoading}
                       required
                     />
                   </div>
-                  
                   <div className="space-y-2">
                     <label htmlFor="lastName" className="block text-sm font-medium">
                       Last Name
@@ -219,7 +237,7 @@ export default function SimpleAuth() {
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Doe"
+                      placeholder="Enter your last name"
                       disabled={isLoading}
                     />
                   </div>
@@ -263,7 +281,7 @@ export default function SimpleAuth() {
                     id="fitnessLevel"
                     value={fitnessLevel}
                     onChange={(e) => setFitnessLevel(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none"
                     disabled={isLoading}
                   >
                     <option value="beginner">Beginner</option>
@@ -282,11 +300,10 @@ export default function SimpleAuth() {
                       type="number"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      placeholder="25"
+                      placeholder="Age"
                       disabled={isLoading}
                     />
                   </div>
-                  
                   <div className="space-y-2">
                     <label htmlFor="weight" className="block text-sm font-medium">
                       Weight (kg)
@@ -294,13 +311,13 @@ export default function SimpleAuth() {
                     <Input
                       id="weight"
                       type="number"
+                      step="0.1"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
-                      placeholder="70"
+                      placeholder="Weight"
                       disabled={isLoading}
                     />
                   </div>
-                  
                   <div className="space-y-2">
                     <label htmlFor="height" className="block text-sm font-medium">
                       Height (cm)
@@ -308,9 +325,10 @@ export default function SimpleAuth() {
                     <Input
                       id="height"
                       type="number"
+                      step="0.1"
                       value={height}
                       onChange={(e) => setHeight(e.target.value)}
-                      placeholder="175"
+                      placeholder="Height"
                       disabled={isLoading}
                     />
                   </div>
@@ -323,7 +341,7 @@ export default function SimpleAuth() {
                       Creating account...
                     </>
                   ) : (
-                    "Create Account"
+                    "Create account"
                   )}
                 </Button>
               </form>
