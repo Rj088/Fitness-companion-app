@@ -45,18 +45,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 HKObjectType.quantityType(forIdentifier: .stepCount)!
             ])
             
-            let healthStore = HKHealthStore()
             healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
                 if let error = error {
                     print("HealthKit authorization error: \(error.localizedDescription)")
+                } else {
+                    print("HealthKit authorization successful")
                 }
-            }
-                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
-            ])
-            
-            healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
-                // Handle health data authorization
             }
         }
         
