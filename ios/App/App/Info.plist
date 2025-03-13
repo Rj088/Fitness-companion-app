@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -22,72 +23,71 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to capture your workout</string>
-	<key>NSMotionUsageDescription</key>
-	<string>This app requires motion and fitness tracking</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>This app requires permission to save your workout data</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>This app requires access to Health data to track your fitness progress</string>
+	<string>This app requires camera access to take photos for your profile and progress tracking</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app requires access to save photos to your library</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photos to upload profile pictures and progress images</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires location access to track your runs</string>
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>This app requires location access to track your outdoor workouts</string>
-        <key>NSMotionUsageDescription</key>
-        <string>This app requires motion and fitness tracking to count your steps and activity</string>
-        <key>NSHealthShareUsageDescription</key>
-        <string>This app requires access to Health data to sync your workouts and activities</string>
-        <key>NSHealthUpdateUsageDescription</key>
-        <string>This app requires permission to save your workout data to the Health app</string>
-        <key>UILaunchStoryboardName</key>
-        <string>LaunchScreen</string>
-        <key>UIMainStoryboardFile</key>
-        <string>Main</string>
-        <key>UIRequiredDeviceCapabilities</key>
-        <array>
-                <string>armv7</string>
-        </array>
-        <key>UISupportedInterfaceOrientations</key>
-        <array>
-                <string>UIInterfaceOrientationPortrait</string>
-                <string>UIInterfaceOrientationLandscapeLeft</string>
-                <string>UIInterfaceOrientationLandscapeRight</string>
-        </array>
-        <key>UISupportedInterfaceOrientations~ipad</key>
-        <array>
-                <string>UIInterfaceOrientationPortrait</string>
-                <string>UIInterfaceOrientationPortraitUpsideDown</string>
-                <string>UIInterfaceOrientationLandscapeLeft</string>
-                <string>UIInterfaceOrientationLandscapeRight</string>
-        </array>
-        <key>UIViewControllerBasedStatusBarAppearance</key>
-        <true/>
-        <key>UIStatusBarStyle</key>
-        <string>UIStatusBarStyleLightContent</string>
-<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to your photo library to upload profile pictures and workout images.</string>
-<key>NSUserTrackingUsageDescription</key>
-	<string>This app needs to track your activity across other companies' apps and websites to provide you with a personalized fitness experience.</string>
-<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to take profile pictures and workout progress photos.</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires your location to track outdoor workouts and activities.</string>
-<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app requires background location access to track your outdoor fitness activities even when the app is not in use.</string>
-<key>NSMotionUsageDescription</key>
-	<string>This app requires motion and fitness data to count steps and detect workout activities.</string>
-<key>NSHealthUpdateUsageDescription</key>
-	<string>This app requires the ability to update health data to sync your workout activities.</string>
-<key>NSHealthShareUsageDescription</key>
-	<string>This app requires the ability to access health data to provide personalized fitness recommendations.</string>
-<key>NSCalendarsUsageDescription</key>
-	<string>This app requires calendar access to schedule and remind you of workout sessions.</string>
-<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>This app requires Bluetooth to connect with fitness devices and wearables.</string>
-<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>This app requires Bluetooth to connect with fitness devices and wearables.</string>
-<key>NSAppleMusicUsageDescription</key>
-	<string>This app requires access to your music library to allow you to play music during workouts.</string>
+	<string>This app requires location access to track your workout routes and find nearby fitness facilities</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires location access to track your workouts and fitness activities even when the app is in the background</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires location access to track your workouts and fitness activities</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app requires motion data access to track your physical activities and step count</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>This app requires access to your health data to display comprehensive fitness information</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>This app requires permission to write fitness data to Apple Health</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires microphone access for voice commands during workouts</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This information is used to deliver personalized fitness content and improve your workout experience</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app needs access to your calendar to schedule workouts and fitness events</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs access to your contacts to find friends for workout sharing</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>This app needs access to your reminders to set workout reminders</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app needs access to your music to create workout playlists</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition to enable voice commands during workouts</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to connect to fitness devices and sensors</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app uses Bluetooth to connect to fitness tracking devices</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app requires motion data to track your fitness activities and step count</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

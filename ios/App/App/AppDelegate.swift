@@ -1,21 +1,25 @@
+
 import UIKit
 import Capacitor
-
-@UIApplicationMain
 import AppTrackingTransparency
 import CoreMotion
+import HealthKit
 
+@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private let healthStore = HKHealthStore()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        // Request permissions early to avoid crashes
+        // Request tracking permission
         if #available(iOS 14.5, *) {
-            ATTrackingManager.requestTrackingAuthorization { status in
-                // Handle tracking permission status
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                ATTrackingManager.requestTrackingAuthorization { status in
+                    // Handle tracking authorization status
+                }
             }
         }
         
@@ -23,9 +27,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if CMMotionActivityManager.isActivityAvailable() {
             let motionManager = CMMotionActivityManager()
             let today = Date()
-            motionManager.queryActivityStarting(from: today, to: today, to: .main) { activities, error in
+            motionManager.queryActivityStarting(from: today, to: today, to: OperationQueue.main) { activities, error in
                 // Just a query to prompt for permission
                 motionManager.stopActivityUpdates()
+            }
+        }
+        
+        // Request health permission if available
+        if HKHealthStore.isHealthDataAvailable() {
+            let typesToRead = Set([
+                HKObjectType.quantityType(forIdentifier: .stepCount)!,
+                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
+            ])
+            
+            let typesToWrite = Set([
+                HKObjectType.quantityType(forIdentifier: .stepCount)!,
+                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
+            ])
+            
+            healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { success, error in
+                // Handle health data authorization
             }
         }
         
@@ -66,5 +89,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
-
 }
