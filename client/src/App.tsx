@@ -51,6 +51,9 @@ function Router() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
 
+  // Debug logging
+  console.log("Router render. Auth state:", { isAuthenticated, loading, location });
+
   // Redirect unauthenticated users to login page
   useEffect(() => {
     const publicRoutes = ["/auth", "/debug"];
@@ -66,7 +69,30 @@ function Router() {
     }
   }, [isAuthenticated, loading, location, setLocation]);
 
-  // Show authenticated components only when authenticated
+  // Show a simplified auth page for debugging
+  if (!isAuthenticated && location === "/auth") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white">
+        <h1 className="text-2xl font-bold mb-8">Authentication Page</h1>
+        <div className="w-full max-w-md p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl mb-4">Login</h2>
+          <form className="space-y-4">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium">Username</label>
+              <input type="text" id="username" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium">Password</label>
+              <input type="password" id="password" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+            </div>
+            <button type="button" className="w-full bg-primary text-white rounded-md py-2">Sign In</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Protected routes handler
   const renderProtectedComponent = (Component: React.ComponentType): JSX.Element => {
     if (loading) {
       return <div className="flex items-center justify-center h-screen">Loading...</div>;
