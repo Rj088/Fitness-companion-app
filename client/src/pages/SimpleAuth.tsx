@@ -46,7 +46,7 @@ export default function SimpleAuth() {
           description: "Registered successfully!",
         });
       }
-      navigate('/');
+      setLocation('/');
     } catch (error: any) {
       toast({
         title: "Error",
