@@ -70,21 +70,26 @@ function Router() {
     }
   }, [isAuthenticated, loading, location, setLocation]);
 
-  // For the auth page, we'll directly render the DirectAuth component
-  if (!isAuthenticated && location === "/auth") {
-    return <DirectAuth />;
+  // Show loading indicator while checking authentication
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  // For the auth page or when not authenticated, directly render the DirectAuth component
+  if (!isAuthenticated) {
+    if (location === "/auth" || location === "/") {
+      return <DirectAuth />;
+    } else {
+      // Redirect to auth for any non-auth routes when not authenticated
+      setLocation("/auth");
+      return <DirectAuth />;
+    }
   }
 
   // Protected routes handler
   const renderProtectedComponent = (Component: React.ComponentType): JSX.Element => {
-    if (loading) {
-      return <div className="flex items-center justify-center h-screen">Loading...</div>;
-    }
-    
-    if (!isAuthenticated) {
-      return <DirectAuth />;
-    }
-    
+    // No loading check needed here anymore as it's handled above
+    // No authentication check needed here anymore as it's handled above
     return <Component />;
   };
 
