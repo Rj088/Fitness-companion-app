@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from '@/lib/context/AuthContext';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { useToast } from "@/hooks/use-toast";
 
 export default function SimpleAuth() {
@@ -17,7 +17,7 @@ export default function SimpleAuth() {
   const [fitnessLevel, setFitnessLevel] = useState('beginner');
 
   const { login, register, isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
+  const [_, navigate] = useLocation();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {

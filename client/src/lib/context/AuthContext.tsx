@@ -102,6 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       console.log("Attempting login with:", credentials);
+      
       const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: {
@@ -218,19 +219,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Logout function
   const logout = async () => {
-    localStorage.removeItem(STORAGE_KEYS.USER_ID);
-    setState({ isAuthenticated: false, user: null, loading: false, error: null });
-    toast({ title: "Logged out", description: "You have been logged out successfully" });
-    window.location.href = "/auth"; // Redirect to auth page
-
     // Added server-side session clearing
     try {
-      await fetch("/api/logout", {
+      await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
         method: "POST",
         credentials: "include"
       });
+      
+      // Clear localStorage and state after successful server logout
+      localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      setState({ isAuthenticated: false, user: null, loading: false, error: null });
+      
+      toast({ 
+        title: "Logged out", 
+        description: "You have been logged out successfully" 
+      });
+      
+      // Use location.href to force a full page reload
+      window.location.href = "/auth";
     } catch (error) {
       console.error("Logout error:", error);
+      
+      // Still clear local state even if server logout fails
+      localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      setState({ isAuthenticated: false, user: null, loading: false, error: null });
+      
+      window.location.href = "/auth";
     }
   };
 

@@ -151,7 +151,7 @@ function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials)
       console.log("Login form submitted with:", data);
       
       // Direct API call for login to ensure it works
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -264,7 +264,7 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (data: RegisterData) 
       console.log("Registration form submitted with:", data);
       
       // Direct API call for registration
-      const response = await fetch('/api/users', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

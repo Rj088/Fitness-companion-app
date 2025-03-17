@@ -451,6 +451,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: `Registration failed: ${error.message}` });
     }
   });
+  
+  // Logout route
+  router.post("/logout", async (req, res) => {
+    try {
+      // We don't need to do anything special here for now since we're not using sessions
+      // If we later implement server-side sessions, we would clear them here
+      res.status(200).json({ message: "Logged out successfully" });
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      res.status(500).json({ message: `Logout failed: ${error.message}` });
+    }
+  });
 
   // Mount the router to /api
   app.use("/api", router);

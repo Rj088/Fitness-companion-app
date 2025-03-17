@@ -2,7 +2,8 @@
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/login',
-    REGISTER: '/api/register'
+    REGISTER: '/api/register',
+    LOGOUT: '/api/logout'
   },
   USERS: {
     GET: (id: number) => `/api/users/${id}`,
