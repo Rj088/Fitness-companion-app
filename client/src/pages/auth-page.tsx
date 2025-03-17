@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/context/AuthContext";
 import { LoginCredentials, RegisterData } from "@/lib/types";
+import { STORAGE_KEYS } from "@/lib/constants";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -170,7 +171,7 @@ function LoginForm({ onSubmit, isLoading }: { onSubmit: (data: LoginCredentials)
       console.log("Login successful. User data:", user);
       
       // Store user ID in localStorage
-      localStorage.setItem('fittrack_user_id', user.id.toString());
+      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
       
       toast({
         title: "Login successful",
@@ -283,7 +284,7 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (data: RegisterData) 
       console.log("Registration successful. User data:", user);
       
       // Store user ID in localStorage
-      localStorage.setItem('fittrack_user_id', user.id.toString());
+      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
       
       toast({
         title: "Registration successful",
