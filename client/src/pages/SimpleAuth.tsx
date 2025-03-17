@@ -17,7 +17,7 @@ export default function SimpleAuth() {
   const [fitnessLevel, setFitnessLevel] = useState('beginner');
 
   const { login, register, isAuthenticated, loading } = useAuth();
-  const [_, navigate] = useLocation();
+  const [_, setLocation] = useLocation();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
