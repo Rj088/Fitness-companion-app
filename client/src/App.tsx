@@ -10,6 +10,7 @@ import Nutrition from "@/pages/Nutrition";
 import Progress from "@/pages/Progress";
 import Profile from "@/pages/Profile";
 import SimpleAuth from "@/pages/SimpleAuth";
+import AuthPage from "@/pages/auth-page";
 import { initializeNativeCapabilities } from "@/lib/native";
 import { useAuth } from "@/lib/context/AuthContext";
 import StatusBar from "@/components/StatusBar";
@@ -72,7 +73,7 @@ function Router() {
     }
     
     if (!isAuthenticated) {
-      return <SimpleAuth />;
+      return <AuthPage />;
     }
     
     return <Component />;
@@ -85,7 +86,7 @@ function Router() {
       <Route path="/nutrition" component={() => renderProtectedComponent(Nutrition)} />
       <Route path="/progress" component={() => renderProtectedComponent(Progress)} />
       <Route path="/profile" component={() => renderProtectedComponent(Profile)} />
-      <Route path="/auth" component={SimpleAuth} />
+      <Route path="/auth" component={AuthPage} />
       <Route path="/debug" component={Debug} />
       <Route component={NotFound} />
     </Switch>
