@@ -71,16 +71,29 @@ function SimpleLogin() {
         
         console.log("Login successful:", data);
         
-        // Store the user id in localStorage
-        localStorage.setItem("fittrack_user_id", data.user.id.toString());
+        // Store the user id in localStorage - notice that data is the user object directly
+        try {
+          console.log("Data received from login:", JSON.stringify(data));
+          if (data && data.id) {
+            localStorage.setItem("fittrack_user_id", data.id.toString());
+            console.log("User ID stored successfully:", data.id);
+          } else {
+            console.error("No user ID found in response:", data);
+          }
+        } catch (storageError) {
+          console.error("Error storing user ID:", storageError);
+        }
         
         alert("Login successful! Redirecting to dashboard...");
         
-        // Redirect to the main app (temporarily commented out since we're not using the full app)
-        // window.location.href = "/";
+        // Reload the page to simulate redirecting to the dashboard
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
       alert(error.message || "Authentication failed");
     } finally {
       setIsLoading(false);
