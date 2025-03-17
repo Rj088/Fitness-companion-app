@@ -82,14 +82,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } else {
         console.log("No stored user ID found, not authenticated");
-        setState(prevState => ({
-          ...prevState,
+        setState({
+          isAuthenticated: false,
+          user: null,
           loading: false,
-        }));
+          error: null,
+        });
       }
     };
 
+    // Set a timeout to ensure loading state is cleared even if auth check fails
+    const timeoutId = setTimeout(() => {
+      setState(prevState => {
+        if (prevState.loading) {
+          console.log("Auth check timed out, setting not authenticated");
+          return {
+            isAuthenticated: false,
+            user: null,
+            loading: false,
+            error: null
+          };
+        }
+        return prevState;
+      });
+    }, 3000);
+    
     checkAuth();
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Login function

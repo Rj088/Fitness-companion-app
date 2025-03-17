@@ -23,7 +23,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
 
   useEffect(() => {
     // Initialize native capabilities
@@ -36,13 +36,38 @@ function App() {
     });
   }, [toast]);
 
+  // Show loading indicator
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="mb-2">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show the login page directly if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen flex flex-col bg-gray-100">
+        <StatusBar />
+        <div className="flex-1 overflow-y-auto">
+          <DirectAuth />
+        </div>
+        <Toaster />
+      </div>
+    );
+  }
+
+  // Show the main app layout if authenticated
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       <StatusBar />
       <div className="flex-1 overflow-y-auto pb-24">
         <Router />
       </div>
-      {isAuthenticated && <TabBar />}
+      <TabBar />
       <Toaster />
     </div>
   );
