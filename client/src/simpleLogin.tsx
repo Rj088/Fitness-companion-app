@@ -46,28 +46,47 @@ function SimpleLogin() {
         
         console.log("Registration attempted with:", { username, password, firstName, lastName });
         
-        // Use the AuthContext register function
-        const success = await register({
-          username,
-          password,
-          firstName,
-          lastName,
-          fitnessLevel: "beginner",
-          dailyStepsGoal: 10000,
-          workoutFrequency: 3
+        // Try direct API call first to bypass potential AuthContext issues
+        console.log("Attempting direct API registration");
+        
+        const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            firstName,
+            lastName,
+            fitnessLevel: "beginner",
+            dailyStepsGoal: 10000,
+            workoutFrequency: 3
+          }),
+          credentials: 'include'
         });
         
-        if (success) {
-          console.log("Registration successful via AuthContext");
-          toast({
-            title: "Account created",
-            description: "Your account has been created successfully!",
-          });
-          
-          // AuthContext handles the storage and redirecting
-        } else {
-          throw new Error("Registration failed");
+        const data = await response.json();
+        console.log("Registration API response:", data);
+        
+        if (!response.ok) {
+          throw new Error(data.message || "Registration failed");
         }
+        
+        // Store user data directly for testing
+        localStorage.setItem(STORAGE_KEYS.USER_ID, data.id.toString());
+        
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully!",
+        });
+        
+        alert("Account created successfully! Redirecting to app...");
+        
+        // Redirect to the main app
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
       } else {
         // Validation
         if (!username || !password) {
@@ -76,28 +95,57 @@ function SimpleLogin() {
         
         console.log("Login attempted with:", { username, password });
         
-        // Use the AuthContext login function
-        const success = await login({ username, password });
+        // Try direct API call first to bypass potential AuthContext issues
+        console.log("Attempting direct API login");
         
-        if (success) {
-          console.log("Login successful via AuthContext");
-          toast({
-            title: "Login successful",
-            description: "You have been logged in successfully!",
-          });
-          
-          // AuthContext handles the storage and redirecting
-        } else {
-          throw new Error("Login failed");
+        const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        console.log("Login API response:", data);
+        
+        if (!response.ok) {
+          throw new Error(data.message || "Login failed");
         }
+        
+        // Store user data directly for testing
+        localStorage.setItem(STORAGE_KEYS.USER_ID, data.id.toString());
+        
+        toast({
+          title: "Login successful",
+          description: "You have been logged in successfully!",
+        });
+        
+        alert("Login successful! Redirecting to app...");
+        
+        // Redirect to the main app
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
+      // More detailed error logging to help debug the issue
+      if (error.cause) console.error("Error cause:", error.cause);
+      if (error.stack) console.error("Error stack:", error.stack);
+      
+      // Show error message in toast and alert for visibility during testing
+      const errorMessage = error.message || "Authentication failed";
       toast({
         title: isRegistering ? "Registration failed" : "Login failed",
-        description: error.message || "Authentication failed",
+        description: errorMessage,
         variant: "destructive",
       });
+      alert(errorMessage); // Temporary for debugging
     } finally {
       setIsLoading(false);
     }
