@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -98,51 +98,71 @@ function App() {
 function Router() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
+  const redirectAttemptedRef = useRef(false);
 
   // Debug logging
   console.log("Router render. Auth state:", { isAuthenticated, loading, location });
 
-  // Redirect users based on authentication state
+  // One-time cleanup on component mount to prevent redirection issues
   useEffect(() => {
+    // Reset the redirection flag in session storage
+    if (sessionStorage.getItem('router_redirect_attempted')) {
+      console.log("Router: Resetting redirection flags");
+      sessionStorage.removeItem('router_redirect_attempted');
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      redirectAttemptedRef.current = false;
+    }
+  }, []);
+
+  // Redirect users based on authentication state - with protection against loops
+  useEffect(() => {
+    // Skip if already attempted to redirect this render cycle
+    if (redirectAttemptedRef.current) {
+      console.log("Router: Already attempted redirect in this session, skipping");
+      return;
+    }
+    
+    // Skip if still loading auth state
     if (loading) {
       console.log("Router: Still loading auth state, skipping redirects");
       return;
     }
     
+    // Check for redirection flag in session storage
+    const routerRedirectAttempted = sessionStorage.getItem('router_redirect_attempted');
+    if (routerRedirectAttempted) {
+      console.log("Router: Redirect already attempted in session, preventing loop");
+      return;
+    }
+    
+    // Set flags to prevent multiple redirects
+    redirectAttemptedRef.current = true;
+    sessionStorage.setItem('router_redirect_attempted', 'true');
+    
     const publicRoutes = ["/auth", "/debug", "/simple-auth"];
     
-    if (!isAuthenticated) {
-      // If user is not authenticated and not on a public route, redirect to auth
-      if (!publicRoutes.includes(location)) {
-        console.log("Router: Redirecting to auth page - not authenticated, current location:", location);
-        try {
+    // Handle redirect logic safely
+    try {
+      if (!isAuthenticated) {
+        // If user is not authenticated and not on a public route, redirect to auth
+        if (!publicRoutes.includes(location)) {
+          console.log("Router: Redirecting to auth page - not authenticated, current location:", location);
           setLocation("/auth");
-        } catch (error) {
-          console.error("Router: Navigation error:", error);
-          // As a fallback, use direct window location change
-          window.location.href = "/auth";
         }
-      }
-    } else {
-      // If user is authenticated and on auth page, redirect to home
-      if (location === "/auth" || location === "/simple-auth") {
-        console.log("Router: Redirecting to home page - already authenticated");
-        try {
+      } else {
+        // If user is authenticated and on auth page, redirect to home
+        if (location === "/auth" || location === "/simple-auth") {
+          console.log("Router: Redirecting to home page - already authenticated");
           setLocation("/");
-          
-          // Double-check that the redirect worked after a short delay
-          setTimeout(() => {
-            if (window.location.pathname === "/auth" || window.location.pathname === "/simple-auth") {
-              console.log("Router: Fallback redirect to homepage with window.location");
-              window.location.href = "/";
-            }
-          }, 500);
-        } catch (error) {
-          console.error("Router: Navigation error:", error);
-          // As a fallback, use direct window location change
-          window.location.href = "/";
         }
       }
+    } catch (error) {
+      console.error("Router: Navigation error:", error);
+      // Clear the flag on error
+      sessionStorage.removeItem('router_redirect_attempted');
     }
   }, [isAuthenticated, loading, location, setLocation]);
 

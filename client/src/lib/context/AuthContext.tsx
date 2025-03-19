@@ -247,9 +247,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include"
       });
       
-      // Clear localStorage and state after successful server logout
-      console.log("Clearing localStorage and auth state...");
+      // Clear localStorage, sessionStorage and state after successful server logout
+      console.log("Clearing localStorage, sessionStorage, and auth state...");
       localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      
+      // Clear any session storage redirect flags to prevent loops on next login
+      sessionStorage.removeItem('router_redirect_attempted');
+      sessionStorage.removeItem('redirect_attempted');
+      
       setState({ isAuthenticated: false, user: null, loading: false, error: null });
       
       toast({ 

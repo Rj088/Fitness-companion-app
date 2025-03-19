@@ -19,9 +19,20 @@ function SimpleLogin() {
   
   // Check if user is already logged in
   useEffect(() => {
+    // Store a flag in sessionStorage to prevent infinite loops
+    const redirectAttempted = sessionStorage.getItem('redirect_attempted');
+    
+    if (redirectAttempted) {
+      console.log("Redirect already attempted in this session, preventing loop");
+      return;
+    }
+    
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (userId) {
       console.log("Checking auth for user ID:", userId);
+      
+      // Set the flag to prevent loops
+      sessionStorage.setItem('redirect_attempted', 'true');
       
       // Verify user exists on the server
       fetch(`/api/users/${userId}`)
@@ -33,20 +44,21 @@ function SimpleLogin() {
         })
         .then(data => {
           if (data.message === "User not found" || !data.id) {
-            console.log("User auth check successful:", data);
             console.log("User auth check failed, clearing stored data");
             localStorage.removeItem(STORAGE_KEYS.USER_ID);
+            sessionStorage.removeItem('redirect_attempted');
             return;
           }
           
           console.log("User auth check successful:", data);
           // Redirect to home page immediately if user is authenticated
-          window.location.replace('/');
+          window.location.href = '/';
         })
         .catch(err => {
           console.error("Failed to verify user:", err);
           // Clear invalid user ID
           localStorage.removeItem(STORAGE_KEYS.USER_ID);
+          sessionStorage.removeItem('redirect_attempted');
         });
     } else {
       console.log("No stored user ID found, not authenticated");
@@ -55,7 +67,11 @@ function SimpleLogin() {
   
   // Function to handle redirect after successful auth
   const redirectToHome = () => {
-    console.log("Redirecting to home page...");
+    console.log("SimpleLogin: Redirecting to home page...");
+    
+    // First clear any session storage redirect flags to prevent loops
+    sessionStorage.removeItem('redirect_attempted');
+    sessionStorage.removeItem('router_redirect_attempted');
     
     // Show redirection message
     const message = document.createElement('div');
@@ -73,17 +89,17 @@ function SimpleLogin() {
     
     // Use a delay to ensure redirection happens
     setTimeout(() => {
-      // Try multiple approaches to ensure redirection works
       try {
-        console.log("Executing window.location.replace() for redirection");
+        console.log("SimpleLogin: Redirecting via window.location.href");
+        // Force a full page reload to ensure clean state
         window.location.href = '/';
       } catch (e) {
-        console.error("Redirect failed:", e);
-        // Fallback to different approach if replace doesn't work
-        console.log("Trying fallback redirection with window.location.href");
+        console.error("SimpleLogin: Redirect failed:", e);
+        // Fallback to a different approach
+        console.log("SimpleLogin: Trying fallback redirection");
         window.location.pathname = '/';
       }
-    }, 2000);
+    }, 1500);
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
