@@ -85,9 +85,9 @@ function SimpleLogin() {
         
         alert("Login successful! Redirecting to dashboard...");
         
-        // Reload the page to simulate redirecting to the dashboard
+        // Redirect to the dashboard - a more direct approach
         setTimeout(() => {
-          window.location.reload();
+          window.location.href = "/dashboard.html";
         }, 1000);
       }
     } catch (error: any) {
