@@ -61,16 +61,38 @@ function App() {
   }
 
   // Show the main app layout if authenticated
-  return (
-    <div className="h-screen flex flex-col bg-gray-100">
-      <StatusBar />
-      <div className="flex-1 overflow-y-auto pb-24">
-        <Router />
+  console.log("App: User is authenticated, rendering main layout");
+  
+  // Enhanced error boundary to catch any rendering issues
+  try {
+    return (
+      <div className="h-screen flex flex-col bg-gray-100">
+        <StatusBar />
+        <div className="flex-1 overflow-y-auto pb-24">
+          <Router />
+        </div>
+        <TabBar />
+        <Toaster />
       </div>
-      <TabBar />
-      <Toaster />
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("App rendering error:", error);
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold mb-4">Something went wrong</h2>
+          <p className="mb-4">We're having trouble displaying the app.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Reload page
+          </button>
+        </div>
+        <Toaster />
+      </div>
+    );
+  }
 }
 
 function Router() {
@@ -80,18 +102,47 @@ function Router() {
   // Debug logging
   console.log("Router render. Auth state:", { isAuthenticated, loading, location });
 
-  // Redirect unauthenticated users to login page
+  // Redirect users based on authentication state
   useEffect(() => {
-    const publicRoutes = ["/auth", "/debug"];
-
-    if (!loading && !isAuthenticated && !publicRoutes.includes(location)) {
-      console.log("Redirecting to auth page - not authenticated, current location:", location);
-      setLocation("/auth");
+    if (loading) {
+      console.log("Router: Still loading auth state, skipping redirects");
+      return;
     }
     
-    if (!loading && isAuthenticated && location === "/auth") {
-      console.log("Redirecting to home page - already authenticated");
-      setLocation("/");
+    const publicRoutes = ["/auth", "/debug", "/simple-auth"];
+    
+    if (!isAuthenticated) {
+      // If user is not authenticated and not on a public route, redirect to auth
+      if (!publicRoutes.includes(location)) {
+        console.log("Router: Redirecting to auth page - not authenticated, current location:", location);
+        try {
+          setLocation("/auth");
+        } catch (error) {
+          console.error("Router: Navigation error:", error);
+          // As a fallback, use direct window location change
+          window.location.href = "/auth";
+        }
+      }
+    } else {
+      // If user is authenticated and on auth page, redirect to home
+      if (location === "/auth" || location === "/simple-auth") {
+        console.log("Router: Redirecting to home page - already authenticated");
+        try {
+          setLocation("/");
+          
+          // Double-check that the redirect worked after a short delay
+          setTimeout(() => {
+            if (window.location.pathname === "/auth" || window.location.pathname === "/simple-auth") {
+              console.log("Router: Fallback redirect to homepage with window.location");
+              window.location.href = "/";
+            }
+          }, 500);
+        } catch (error) {
+          console.error("Router: Navigation error:", error);
+          // As a fallback, use direct window location change
+          window.location.href = "/";
+        }
+      }
     }
   }, [isAuthenticated, loading, location, setLocation]);
 

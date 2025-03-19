@@ -241,12 +241,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     // Added server-side session clearing
     try {
+      console.log("Attempting logout via API...");
       await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
         method: "POST",
         credentials: "include"
       });
       
       // Clear localStorage and state after successful server logout
+      console.log("Clearing localStorage and auth state...");
       localStorage.removeItem(STORAGE_KEYS.USER_ID);
       setState({ isAuthenticated: false, user: null, loading: false, error: null });
       
@@ -255,8 +257,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "You have been logged out successfully" 
       });
       
-      // Use location.href to force a full page reload
-      window.location.href = "/auth";
+      // Show visual confirmation before redirecting
+      const message = document.createElement('div');
+      message.style.position = 'fixed';
+      message.style.top = '0';
+      message.style.left = '0';
+      message.style.width = '100%';
+      message.style.padding = '1rem';
+      message.style.backgroundColor = '#4CAF50';
+      message.style.color = 'white';
+      message.style.textAlign = 'center';
+      message.style.zIndex = '9999';
+      message.innerText = 'Logged out successfully! Redirecting...';
+      document.body.appendChild(message);
+      
+      // Use setTimeout to ensure state updates before navigation
+      setTimeout(() => {
+        console.log("Redirecting to auth page after logout...");
+        // Use location.href to force a full page reload
+        window.location.href = "/auth";
+      }, 1500);
     } catch (error) {
       console.error("Logout error:", error);
       
@@ -264,7 +284,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem(STORAGE_KEYS.USER_ID);
       setState({ isAuthenticated: false, user: null, loading: false, error: null });
       
-      window.location.href = "/auth";
+      // Show error message but still redirect
+      toast({
+        title: "Logout issue",
+        description: "There was an issue with the logout process, but you've been logged out locally.",
+        variant: "destructive"
+      });
+      
+      setTimeout(() => {
+        console.log("Redirecting to auth page after failed logout...");
+        window.location.href = "/auth";
+      }, 1500);
     }
   };
 

@@ -20,32 +20,107 @@ export default function DirectAuth() {
     try {
       if (!isRegistering) {
         // Login
+        console.log("DirectAuth: Attempting login...");
         const success = await login({ username, password });
+        
         if (success) {
+          console.log("DirectAuth: Login successful, preparing to redirect...");
           toast({
             title: "Login successful",
             description: "Welcome back!",
           });
-          setLocation("/");
+          
+          // Show visual confirmation
+          const message = document.createElement('div');
+          message.style.position = 'fixed';
+          message.style.top = '0';
+          message.style.left = '0';
+          message.style.width = '100%';
+          message.style.padding = '1rem';
+          message.style.backgroundColor = '#4CAF50';
+          message.style.color = 'white';
+          message.style.textAlign = 'center';
+          message.style.zIndex = '9999';
+          message.innerText = 'Login successful! Redirecting...';
+          document.body.appendChild(message);
+          
+          // Use setTimeout to ensure toast is displayed before redirect
+          setTimeout(() => {
+            console.log("DirectAuth: Redirecting to home page...");
+            try {
+              setLocation("/");
+              // As a fallback, also use direct window.location after a slight delay
+              setTimeout(() => {
+                if (window.location.pathname !== "/") {
+                  console.log("DirectAuth: Fallback redirection with window.location.href");
+                  window.location.href = "/";
+                }
+              }, 500);
+            } catch (navError) {
+              console.error("Navigation error:", navError);
+              window.location.href = "/";
+            }
+          }, 1000);
+        } else {
+          console.log("DirectAuth: Login failed");
         }
       } else {
         // Register
+        console.log("DirectAuth: Attempting registration...");
         const success = await register({
           username,
           password,
           firstName,
           lastName,
           fitnessLevel: "beginner",
+          dailyStepsGoal: 10000,
+          workoutFrequency: 3
         });
+        
         if (success) {
+          console.log("DirectAuth: Registration successful, preparing to redirect...");
           toast({
             title: "Registration successful",
             description: "Welcome to FitTrack!",
           });
-          setLocation("/");
+          
+          // Show visual confirmation
+          const message = document.createElement('div');
+          message.style.position = 'fixed';
+          message.style.top = '0';
+          message.style.left = '0';
+          message.style.width = '100%';
+          message.style.padding = '1rem';
+          message.style.backgroundColor = '#4CAF50';
+          message.style.color = 'white';
+          message.style.textAlign = 'center';
+          message.style.zIndex = '9999';
+          message.innerText = 'Account created successfully! Redirecting...';
+          document.body.appendChild(message);
+          
+          // Use setTimeout to ensure toast is displayed before redirect
+          setTimeout(() => {
+            console.log("DirectAuth: Redirecting to home page...");
+            try {
+              setLocation("/");
+              // As a fallback, also use direct window.location after a slight delay
+              setTimeout(() => {
+                if (window.location.pathname !== "/") {
+                  console.log("DirectAuth: Fallback redirection with window.location.href");
+                  window.location.href = "/";
+                }
+              }, 500);
+            } catch (navError) {
+              console.error("Navigation error:", navError);
+              window.location.href = "/";
+            }
+          }, 1000);
+        } else {
+          console.log("DirectAuth: Registration failed");
         }
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast({
         title: "Error",
         description: error.message || "Authentication failed",

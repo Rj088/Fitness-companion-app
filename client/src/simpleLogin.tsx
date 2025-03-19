@@ -75,11 +75,13 @@ function SimpleLogin() {
     setTimeout(() => {
       // Try multiple approaches to ensure redirection works
       try {
-        window.location.replace('/');
+        console.log("Executing window.location.replace() for redirection");
+        window.location.href = '/';
       } catch (e) {
         console.error("Redirect failed:", e);
-        // Fallback to href if replace doesn't work
-        window.location.href = '/';
+        // Fallback to different approach if replace doesn't work
+        console.log("Trying fallback redirection with window.location.href");
+        window.location.pathname = '/';
       }
     }, 2000);
   };
