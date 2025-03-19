@@ -65,22 +65,26 @@ function SimpleLogin() {
     }
   }, []);
   
-  // Function to handle redirect after successful auth
+  // Enhanced function to handle redirect after successful auth
   const redirectToHome = () => {
-    console.log("SimpleLogin: Redirecting to home page with direct reload approach...");
+    console.log("SimpleLogin: Preparing enhanced home page redirect");
     
-    // Clear all storage flags to avoid any redirection loops
-    sessionStorage.clear();  // Clear all session storage items
+    // Clear all session storage to avoid any redirection loops
+    sessionStorage.clear();
     
-    // Make sure we have the user ID in localStorage first
-    // (otherwise it would get cleared in the next step)
+    // Verify user ID exists in localStorage 
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (!userId) {
       console.error("SimpleLogin: No user ID found in local storage before redirect!");
+      toast({
+        title: "Error",
+        description: "Authentication issue - unable to complete login process",
+        variant: "destructive"
+      });
       return;
     }
     
-    // Show redirection message
+    // Show visual feedback
     const message = document.createElement('div');
     message.style.position = 'fixed';
     message.style.top = '0';
@@ -94,27 +98,25 @@ function SimpleLogin() {
     message.innerText = 'Authentication successful! Redirecting...';
     document.body.appendChild(message);
     
-    // Use a very short delay for the redirect
+    // Set success flags for the home component to detect
+    const timestamp = new Date().getTime();
+    localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
+    localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
+    
+    // Use minimal delay for better UX
     setTimeout(() => {
       try {
         console.log("SimpleLogin: Executing direct homepage navigation");
         
-        // Force a hard redirect to home page with a cache-busting parameter
-        console.log("SimpleLogin: Setting window.location to /");
-        
-        // Set a flag that will be checked on the target page
-        const timestamp = new Date().getTime();
-        localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
-        localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
-        
-        // Force the browser to do a full reload to reset all React state
+        // Use window.open with _self for most reliable navigation reset
         window.open('/', '_self');
-        
       } catch (e) {
-        console.error("SimpleLogin: Redirect failed:", e);
-        alert("There was an issue with the redirect. Please click OK to try again.");
+        console.error("SimpleLogin: Primary redirect method failed:", e);
         
-        // Last resort emergency redirect
+        // Add a backup flag for emergency situations
+        localStorage.setItem('REDIRECT_EMERGENCY', 'true');
+        
+        // Try fallback method without alert for better UX
         window.location.href = '/';
       }
     }, 100);
@@ -171,15 +173,19 @@ function SimpleLogin() {
         // Store user data directly for testing
         localStorage.setItem(STORAGE_KEYS.USER_ID, data.id.toString());
         
+        // Show single success toast (no alert in production)
         toast({
           title: "Account created",
           description: "Your account has been created successfully!",
         });
         
-        alert("Account created successfully! Redirecting to home page...");
+        // Set registration flag to show a special welcome message
+        localStorage.setItem('REGISTRATION_SUCCESS', 'true');
         
-        // Call the redirect function
-        redirectToHome();
+        // Call the redirect function after a brief delay to let toast appear
+        setTimeout(() => {
+          redirectToHome();
+        }, 300);
       } else {
         // Validation
         if (!username || !password) {
@@ -213,15 +219,16 @@ function SimpleLogin() {
         // Store user data directly for testing
         localStorage.setItem(STORAGE_KEYS.USER_ID, data.id.toString());
         
+        // Show success toast (no alert in production)
         toast({
           title: "Login successful",
           description: "You have been logged in successfully!",
         });
         
-        alert("Login successful! Redirecting to home page...");
-        
-        // Call the redirect function
-        redirectToHome();
+        // Call the redirect function after a brief delay to let toast appear
+        setTimeout(() => {
+          redirectToHome();
+        }, 300);
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
@@ -229,14 +236,22 @@ function SimpleLogin() {
       if (error.cause) console.error("Error cause:", error.cause);
       if (error.stack) console.error("Error stack:", error.stack);
       
-      // Show error message in toast and alert for visibility during testing
+      // Enhanced error feedback with more details
       const errorMessage = error.message || "Authentication failed";
+      
+      // Clear any previous error tracking
+      localStorage.removeItem('AUTH_ERROR'); 
+      
+      // Track this error with timestamp
+      localStorage.setItem('AUTH_ERROR', 'true');
+      localStorage.setItem('AUTH_ERROR_TIME', new Date().getTime().toString());
+      
+      // Show error toast (no alert in production)
       toast({
         title: isRegistering ? "Registration failed" : "Login failed",
         description: errorMessage,
         variant: "destructive",
       });
-      alert(errorMessage); // Temporary for debugging
     } finally {
       setIsLoading(false);
     }
