@@ -1,9 +1,13 @@
-import { createRoot } from "react-dom/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "./lib/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { STORAGE_KEYS, API_ENDPOINTS } from "./lib/constants";
 import "./index.css";
 
 // Simple standalone login page for testing
 function SimpleLogin() {
+  const { isAuthenticated, login, register, user } = useAuth();
+  const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -13,86 +17,87 @@ function SimpleLogin() {
   
   console.log("Rendering SimpleLogin component");
   
+  // Check if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log("User already authenticated, redirecting to main app");
+      window.location.href = "/";
+    }
+  }, [isAuthenticated, user]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
       if (isRegistering) {
+        // Validation
+        if (!username || !password || !firstName) {
+          throw new Error("Please fill out all required fields");
+        }
+        
+        if (username.length < 3) {
+          throw new Error("Username must be at least 3 characters");
+        }
+        
+        if (password.length < 6) {
+          throw new Error("Password must be at least 6 characters");
+        }
+        
         console.log("Registration attempted with:", { username, password, firstName, lastName });
         
-        // Call registration API
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            password,
-            firstName,
-            lastName,
-            fitnessLevel: "beginner",
-            dailyStepsGoal: 10000,
-            workoutFrequency: 3
-          }),
+        // Use the AuthContext register function
+        const success = await register({
+          username,
+          password,
+          firstName,
+          lastName,
+          fitnessLevel: "beginner",
+          dailyStepsGoal: 10000,
+          workoutFrequency: 3
         });
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error || "Registration failed");
+        if (success) {
+          console.log("Registration successful via AuthContext");
+          toast({
+            title: "Account created",
+            description: "Your account has been created successfully!",
+          });
+          
+          // AuthContext handles the storage and redirecting
+        } else {
+          throw new Error("Registration failed");
+        }
+      } else {
+        // Validation
+        if (!username || !password) {
+          throw new Error("Please enter both username and password");
         }
         
-        console.log("Registration successful:", data);
-        alert("Account created successfully! Please log in with your new credentials.");
-        setIsRegistering(false);
-      } else {
         console.log("Login attempted with:", { username, password });
         
-        // Call login API
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            password,
-          }),
-        });
+        // Use the AuthContext login function
+        const success = await login({ username, password });
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error || "Login failed");
+        if (success) {
+          console.log("Login successful via AuthContext");
+          toast({
+            title: "Login successful",
+            description: "You have been logged in successfully!",
+          });
+          
+          // AuthContext handles the storage and redirecting
+        } else {
+          throw new Error("Login failed");
         }
-        
-        console.log("Login successful:", data);
-        
-        // Store the user id in localStorage - notice that data is the user object directly
-        try {
-          console.log("Data received from login:", JSON.stringify(data));
-          if (data && data.id) {
-            localStorage.setItem("fittrack_user_id", data.id.toString());
-            console.log("User ID stored successfully:", data.id);
-          } else {
-            console.error("No user ID found in response:", data);
-          }
-        } catch (storageError) {
-          console.error("Error storing user ID:", storageError);
-        }
-        
-        alert("Login successful! Redirecting to dashboard...");
-        
-        // Redirect to the dashboard - a more direct approach
-        setTimeout(() => {
-          window.location.href = "/dashboard.html";
-        }, 1000);
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
-      alert(error.message || "Authentication failed");
+      toast({
+        title: isRegistering ? "Registration failed" : "Login failed",
+        description: error.message || "Authentication failed",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
