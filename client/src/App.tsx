@@ -26,6 +26,15 @@ function App() {
   const { isAuthenticated, user, loading } = useAuth();
 
   useEffect(() => {
+    // Check for force home redirect flag
+    const forceHomeRedirect = localStorage.getItem('force_home_redirect');
+    if (forceHomeRedirect) {
+      console.log("App: Detected force_home_redirect flag, redirecting to home");
+      localStorage.removeItem('force_home_redirect');
+      window.location.href = '/';
+      return;
+    }
+    
     // Initialize native capabilities
     initializeNativeCapabilities().catch((error: Error) => {
       toast({

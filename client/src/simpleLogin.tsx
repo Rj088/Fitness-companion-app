@@ -87,19 +87,37 @@ function SimpleLogin() {
     message.innerText = 'Authentication successful! Redirecting to home page...';
     document.body.appendChild(message);
     
-    // Use a delay to ensure redirection happens
+    // Use a shorter delay to ensure redirection happens faster
     setTimeout(() => {
       try {
-        console.log("SimpleLogin: Redirecting via window.location.href");
-        // Force a full page reload to ensure clean state
-        window.location.href = '/';
+        console.log("SimpleLogin: Executing forced redirect to home");
+        
+        // Force a complete reset - clear any potential conflicting state
+        localStorage.setItem('force_home_redirect', 'true');
+        
+        // Set a timestamp to ensure browser doesn't cache the redirect
+        const timestamp = new Date().getTime();
+        
+        // Force a full page reload using different approaches to ensure one works
+        window.location.replace(`/?t=${timestamp}`);
+        
+        // Fallback methods that will execute if the first method is delayed
+        setTimeout(() => {
+          console.log("SimpleLogin: Using fallback redirect method");
+          window.location.href = `/?t=${timestamp}`;
+          
+          // Final desperate attempt if all else fails
+          setTimeout(() => {
+            console.log("SimpleLogin: Using final redirect method");
+            document.location.href = '/';
+          }, 300);
+        }, 300);
       } catch (e) {
         console.error("SimpleLogin: Redirect failed:", e);
-        // Fallback to a different approach
-        console.log("SimpleLogin: Trying fallback redirection");
+        // Emergency fallback
         window.location.pathname = '/';
       }
-    }, 1500);
+    }, 500); // Reduced timeout for faster response
   };
   
   const handleSubmit = async (e: React.FormEvent) => {

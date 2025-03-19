@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
 import { useActivities } from "@/lib/hooks/useProgress";
@@ -8,8 +9,29 @@ import MacroSummary from "@/components/nutrition/MacroSummary";
 import MealItem from "@/components/nutrition/MealItem";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { toast } = useToast();
+  
+  // Check for redirection success flag
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const timestamp = urlParams.get('t');
+    
+    if (timestamp) {
+      // Clear the URL parameters without triggering a page refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Show welcome toast
+      toast({
+        title: "Welcome",
+        description: "You have successfully logged in!",
+      });
+      
+      console.log("Home: Detected redirection with timestamp:", timestamp);
+    }
+  }, [toast]);
   const { data: user, isLoading: isLoadingUser } = useUser();
   const { data: todayActivities, isLoading: isLoadingActivities } = useActivities();
   const { data: userWorkouts, isLoading: isLoadingWorkouts } = useWorkouts({ 
