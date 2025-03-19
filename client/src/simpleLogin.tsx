@@ -25,10 +25,22 @@ function SimpleLogin() {
       
       // Verify user exists on the server
       fetch(`/api/users/${userId}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("User not found or server error");
+          }
+          return res.json();
+        })
         .then(data => {
+          if (data.message === "User not found" || !data.id) {
+            console.log("User auth check successful:", data);
+            console.log("User auth check failed, clearing stored data");
+            localStorage.removeItem(STORAGE_KEYS.USER_ID);
+            return;
+          }
+          
           console.log("User auth check successful:", data);
-          // Redirect to dashboard immediately if user is authenticated
+          // Redirect to home page immediately if user is authenticated
           window.location.replace('/');
         })
         .catch(err => {
@@ -42,8 +54,8 @@ function SimpleLogin() {
   }, []);
   
   // Function to handle redirect after successful auth
-  const redirectToDashboard = () => {
-    console.log("Redirecting to dashboard...");
+  const redirectToHome = () => {
+    console.log("Redirecting to home page...");
     
     // Show redirection message
     const message = document.createElement('div');
@@ -128,10 +140,10 @@ function SimpleLogin() {
           description: "Your account has been created successfully!",
         });
         
-        alert("Account created successfully! Redirecting to dashboard...");
+        alert("Account created successfully! Redirecting to home page...");
         
         // Call the redirect function
-        redirectToDashboard();
+        redirectToHome();
       } else {
         // Validation
         if (!username || !password) {
@@ -170,10 +182,10 @@ function SimpleLogin() {
           description: "You have been logged in successfully!",
         });
         
-        alert("Login successful! Redirecting to dashboard...");
+        alert("Login successful! Redirecting to home page...");
         
         // Call the redirect function
-        redirectToDashboard();
+        redirectToHome();
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
