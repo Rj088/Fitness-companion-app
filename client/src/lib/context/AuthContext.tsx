@@ -237,7 +237,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Logout function
+  // Logout function with improved direct navigation
   const logout = async () => {
     // Added server-side session clearing
     try {
@@ -247,16 +247,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include"
       });
       
-      // Clear localStorage, sessionStorage and state after successful server logout
-      console.log("Clearing localStorage, sessionStorage, and auth state...");
-      localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      // Complete cleanup - remove all storage items
+      console.log("Performing complete cleanup of localStorage and sessionStorage");
       
-      // Clear any session storage redirect flags to prevent loops on next login
-      sessionStorage.removeItem('router_redirect_attempted');
-      sessionStorage.removeItem('redirect_attempted');
+      // Clear all localStorage items
+      localStorage.clear();
       
+      // Clear all sessionStorage items
+      sessionStorage.clear();
+      
+      // Update auth state
       setState({ isAuthenticated: false, user: null, loading: false, error: null });
       
+      // Show toast feedback
       toast({ 
         title: "Logged out", 
         description: "You have been logged out successfully" 
@@ -276,30 +279,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       message.innerText = 'Logged out successfully! Redirecting...';
       document.body.appendChild(message);
       
-      // Use setTimeout to ensure state updates before navigation
+      // Set a special flag for auth page to detect a logout redirect
+      localStorage.setItem('LOGOUT_REDIRECT', 'true');
+      localStorage.setItem('LOGOUT_TIMESTAMP', new Date().getTime().toString());
+      
+      // Use a shorter delay for better UX
       setTimeout(() => {
-        console.log("Redirecting to auth page after logout...");
-        // Use location.href to force a full page reload
-        window.location.href = "/auth";
-      }, 1500);
+        console.log("Executing direct navigation to auth page");
+        // Force a complete reset using multiple approaches to ensure one works
+        try {
+          // Use window.open for most reliable navigation
+          window.open('/auth', '_self');
+        } catch (e) {
+          console.error("Primary redirect failed, using fallback:", e);
+          window.location.href = "/auth";
+        }
+      }, 800);
     } catch (error) {
       console.error("Logout error:", error);
       
-      // Still clear local state even if server logout fails
-      localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      // Still clear all storage even if server logout fails
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Set logged out state
       setState({ isAuthenticated: false, user: null, loading: false, error: null });
+      
+      // Set a special flag for auth page to detect a logout redirect
+      localStorage.setItem('LOGOUT_REDIRECT', 'true');
+      localStorage.setItem('LOGOUT_ERROR', 'true');
       
       // Show error message but still redirect
       toast({
         title: "Logout issue",
-        description: "There was an issue with the logout process, but you've been logged out locally.",
+        description: "There was an issue with the logout process, but you've been logged out.",
         variant: "destructive"
       });
       
+      // Use shorter timeout for better UX
       setTimeout(() => {
         console.log("Redirecting to auth page after failed logout...");
         window.location.href = "/auth";
-      }, 1500);
+      }, 800);
     }
   };
 

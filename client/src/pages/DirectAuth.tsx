@@ -14,6 +14,49 @@ export default function DirectAuth() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   
+  // Improved redirection function with more direct approach
+  const redirectToHome = () => {
+    console.log("DirectAuth: Preparing forced redirect to home page");
+    
+    // Clear any redirection flags in session storage
+    sessionStorage.clear();
+    
+    // Show visual confirmation
+    const message = document.createElement('div');
+    message.style.position = 'fixed';
+    message.style.top = '0';
+    message.style.left = '0';
+    message.style.width = '100%';
+    message.style.padding = '1rem';
+    message.style.backgroundColor = '#4CAF50';
+    message.style.color = 'white';
+    message.style.textAlign = 'center';
+    message.style.zIndex = '9999';
+    message.innerText = 'Authentication successful! Redirecting...';
+    document.body.appendChild(message);
+    
+    // Set flags for the Home component to detect
+    const timestamp = new Date().getTime();
+    localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
+    localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
+    
+    // Use a shorter delay for better user experience
+    setTimeout(() => {
+      try {
+        console.log("DirectAuth: Executing direct homepage navigation");
+        
+        // Force the browser to do a full reload to reset all React state
+        window.open('/', '_self');
+        
+      } catch (e) {
+        console.error("DirectAuth: Redirect failed:", e);
+        
+        // Last resort emergency redirect
+        window.location.href = '/';
+      }
+    }, 500);
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -30,37 +73,8 @@ export default function DirectAuth() {
             description: "Welcome back!",
           });
           
-          // Show visual confirmation
-          const message = document.createElement('div');
-          message.style.position = 'fixed';
-          message.style.top = '0';
-          message.style.left = '0';
-          message.style.width = '100%';
-          message.style.padding = '1rem';
-          message.style.backgroundColor = '#4CAF50';
-          message.style.color = 'white';
-          message.style.textAlign = 'center';
-          message.style.zIndex = '9999';
-          message.innerText = 'Login successful! Redirecting...';
-          document.body.appendChild(message);
-          
-          // Use setTimeout to ensure toast is displayed before redirect
-          setTimeout(() => {
-            console.log("DirectAuth: Redirecting to home page...");
-            try {
-              setLocation("/");
-              // As a fallback, also use direct window.location after a slight delay
-              setTimeout(() => {
-                if (window.location.pathname !== "/") {
-                  console.log("DirectAuth: Fallback redirection with window.location.href");
-                  window.location.href = "/";
-                }
-              }, 500);
-            } catch (navError) {
-              console.error("Navigation error:", navError);
-              window.location.href = "/";
-            }
-          }, 1000);
+          // Use our improved redirect function
+          redirectToHome();
         } else {
           console.log("DirectAuth: Login failed");
         }
@@ -84,37 +98,8 @@ export default function DirectAuth() {
             description: "Welcome to FitTrack!",
           });
           
-          // Show visual confirmation
-          const message = document.createElement('div');
-          message.style.position = 'fixed';
-          message.style.top = '0';
-          message.style.left = '0';
-          message.style.width = '100%';
-          message.style.padding = '1rem';
-          message.style.backgroundColor = '#4CAF50';
-          message.style.color = 'white';
-          message.style.textAlign = 'center';
-          message.style.zIndex = '9999';
-          message.innerText = 'Account created successfully! Redirecting...';
-          document.body.appendChild(message);
-          
-          // Use setTimeout to ensure toast is displayed before redirect
-          setTimeout(() => {
-            console.log("DirectAuth: Redirecting to home page...");
-            try {
-              setLocation("/");
-              // As a fallback, also use direct window.location after a slight delay
-              setTimeout(() => {
-                if (window.location.pathname !== "/") {
-                  console.log("DirectAuth: Fallback redirection with window.location.href");
-                  window.location.href = "/";
-                }
-              }, 500);
-            } catch (navError) {
-              console.error("Navigation error:", navError);
-              window.location.href = "/";
-            }
-          }, 1000);
+          // Use our improved redirect function
+          redirectToHome();
         } else {
           console.log("DirectAuth: Registration failed");
         }

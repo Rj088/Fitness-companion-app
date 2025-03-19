@@ -14,23 +14,51 @@ import { useToast } from "@/hooks/use-toast";
 export default function Home() {
   const { toast } = useToast();
   
-  // Check for redirection success flag
+  // Enhanced check for redirection success flags
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const timestamp = urlParams.get('t');
+    const handleRedirectFlags = () => {
+      // Check localStorage for different redirect scenarios
+      const loginSuccess = localStorage.getItem('LOGIN_REDIRECT_SUCCESS');
+      const loginTimestamp = localStorage.getItem('LOGIN_REDIRECT_TIMESTAMP');
+      const logoutRedirect = localStorage.getItem('LOGOUT_REDIRECT');
+      
+      // Also check URL params (legacy support)
+      const urlParams = new URLSearchParams(window.location.search);
+      const timestamp = urlParams.get('t');
+      
+      if (loginSuccess) {
+        console.log("Home: Detected successful login redirect");
+        
+        // Check if this is a new login (within the last 5 seconds)
+        const now = new Date().getTime();
+        const loginTime = loginTimestamp ? parseInt(loginTimestamp) : 0;
+        const isRecentLogin = now - loginTime < 5000;
+        
+        if (isRecentLogin) {
+          // Show welcome toast
+          toast({
+            title: "Welcome",
+            description: "You have successfully logged in!",
+            variant: "default",
+          });
+        }
+        
+        // Clear localStorage redirect flags
+        localStorage.removeItem('LOGIN_REDIRECT_SUCCESS');
+        localStorage.removeItem('LOGIN_REDIRECT_TIMESTAMP');
+      }
+      
+      // Clean up URL parameters if present (legacy support)
+      if (timestamp || window.location.search) {
+        // Clear the URL parameters without triggering a page refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    };
     
-    if (timestamp) {
-      // Clear the URL parameters without triggering a page refresh
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Show welcome toast
-      toast({
-        title: "Welcome",
-        description: "You have successfully logged in!",
-      });
-      
-      console.log("Home: Detected redirection with timestamp:", timestamp);
-    }
+    // Run the check with a slight delay to ensure all components are mounted
+    const timeoutId = setTimeout(handleRedirectFlags, 300);
+    
+    return () => clearTimeout(timeoutId);
   }, [toast]);
   const { data: user, isLoading: isLoadingUser } = useUser();
   const { data: todayActivities, isLoading: isLoadingActivities } = useActivities();

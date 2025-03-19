@@ -67,11 +67,18 @@ function SimpleLogin() {
   
   // Function to handle redirect after successful auth
   const redirectToHome = () => {
-    console.log("SimpleLogin: Redirecting to home page...");
+    console.log("SimpleLogin: Redirecting to home page with direct reload approach...");
     
-    // First clear any session storage redirect flags to prevent loops
-    sessionStorage.removeItem('redirect_attempted');
-    sessionStorage.removeItem('router_redirect_attempted');
+    // Clear all storage flags to avoid any redirection loops
+    sessionStorage.clear();  // Clear all session storage items
+    
+    // Make sure we have the user ID in localStorage first
+    // (otherwise it would get cleared in the next step)
+    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+    if (!userId) {
+      console.error("SimpleLogin: No user ID found in local storage before redirect!");
+      return;
+    }
     
     // Show redirection message
     const message = document.createElement('div');
@@ -84,40 +91,33 @@ function SimpleLogin() {
     message.style.color = 'white';
     message.style.textAlign = 'center';
     message.style.zIndex = '9999';
-    message.innerText = 'Authentication successful! Redirecting to home page...';
+    message.innerText = 'Authentication successful! Redirecting...';
     document.body.appendChild(message);
     
-    // Use a shorter delay to ensure redirection happens faster
+    // Use a very short delay for the redirect
     setTimeout(() => {
       try {
-        console.log("SimpleLogin: Executing forced redirect to home");
+        console.log("SimpleLogin: Executing direct homepage navigation");
         
-        // Force a complete reset - clear any potential conflicting state
-        localStorage.setItem('force_home_redirect', 'true');
+        // Force a hard redirect to home page with a cache-busting parameter
+        console.log("SimpleLogin: Setting window.location to /");
         
-        // Set a timestamp to ensure browser doesn't cache the redirect
+        // Set a flag that will be checked on the target page
         const timestamp = new Date().getTime();
+        localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
+        localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
         
-        // Force a full page reload using different approaches to ensure one works
-        window.location.replace(`/?t=${timestamp}`);
+        // Force the browser to do a full reload to reset all React state
+        window.open('/', '_self');
         
-        // Fallback methods that will execute if the first method is delayed
-        setTimeout(() => {
-          console.log("SimpleLogin: Using fallback redirect method");
-          window.location.href = `/?t=${timestamp}`;
-          
-          // Final desperate attempt if all else fails
-          setTimeout(() => {
-            console.log("SimpleLogin: Using final redirect method");
-            document.location.href = '/';
-          }, 300);
-        }, 300);
       } catch (e) {
         console.error("SimpleLogin: Redirect failed:", e);
-        // Emergency fallback
-        window.location.pathname = '/';
+        alert("There was an issue with the redirect. Please click OK to try again.");
+        
+        // Last resort emergency redirect
+        window.location.href = '/';
       }
-    }, 500); // Reduced timeout for faster response
+    }, 100);
   };
   
   const handleSubmit = async (e: React.FormEvent) => {

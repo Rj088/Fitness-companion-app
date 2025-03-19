@@ -26,7 +26,15 @@ function App() {
   const { isAuthenticated, user, loading } = useAuth();
 
   useEffect(() => {
-    // Check for force home redirect flag
+    // Check for login redirect flags from simpleLogin component
+    const loginRedirectSuccess = localStorage.getItem('LOGIN_REDIRECT_SUCCESS');
+    
+    if (loginRedirectSuccess) {
+      console.log("App: Detected LOGIN_REDIRECT_SUCCESS flag");
+      // Don't remove the flag here, let Home component handle it
+    }
+    
+    // Check for deprecated redirect flag (backward compatibility)
     const forceHomeRedirect = localStorage.getItem('force_home_redirect');
     if (forceHomeRedirect) {
       console.log("App: Detected force_home_redirect flag, redirecting to home");
