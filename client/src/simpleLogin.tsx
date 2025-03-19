@@ -19,11 +19,58 @@ function SimpleLogin() {
   
   // Check if user is already logged in
   useEffect(() => {
-    if (isAuthenticated && user) {
-      console.log("User already authenticated, redirecting to main app");
-      window.location.href = "/";
+    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+    if (userId) {
+      console.log("Checking auth for user ID:", userId);
+      
+      // Verify user exists on the server
+      fetch(`/api/users/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("User auth check successful:", data);
+          // Redirect to dashboard immediately if user is authenticated
+          window.location.replace('/');
+        })
+        .catch(err => {
+          console.error("Failed to verify user:", err);
+          // Clear invalid user ID
+          localStorage.removeItem(STORAGE_KEYS.USER_ID);
+        });
+    } else {
+      console.log("No stored user ID found, not authenticated");
     }
-  }, [isAuthenticated, user]);
+  }, []);
+  
+  // Function to handle redirect after successful auth
+  const redirectToDashboard = () => {
+    console.log("Redirecting to dashboard...");
+    
+    // Show redirection message
+    const message = document.createElement('div');
+    message.style.position = 'fixed';
+    message.style.top = '0';
+    message.style.left = '0';
+    message.style.width = '100%';
+    message.style.padding = '1rem';
+    message.style.backgroundColor = '#4CAF50';
+    message.style.color = 'white';
+    message.style.textAlign = 'center';
+    message.style.zIndex = '9999';
+    message.innerText = 'Authentication successful! Redirecting to home page...';
+    document.body.appendChild(message);
+    
+    // Use a delay to ensure redirection happens
+    setTimeout(() => {
+      // Try multiple approaches to ensure redirection works
+      try {
+        window.location.replace('/');
+      } catch (e) {
+        console.error("Redirect failed:", e);
+        // Fallback to href if replace doesn't work
+        window.location.href = '/';
+      }
+    }, 2000);
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,12 +128,10 @@ function SimpleLogin() {
           description: "Your account has been created successfully!",
         });
         
-        alert("Account created successfully! Redirecting to app...");
+        alert("Account created successfully! Redirecting to dashboard...");
         
-        // Redirect to the main app
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
+        // Call the redirect function
+        redirectToDashboard();
       } else {
         // Validation
         if (!username || !password) {
@@ -125,12 +170,10 @@ function SimpleLogin() {
           description: "You have been logged in successfully!",
         });
         
-        alert("Login successful! Redirecting to app...");
+        alert("Login successful! Redirecting to dashboard...");
         
-        // Redirect to the main app
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
+        // Call the redirect function
+        redirectToDashboard();
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
