@@ -1,11 +1,8 @@
 import { createRoot } from "react-dom/client";
-import App from "./App";
 import "./index.css";
-import { AuthProvider } from "./lib/context/AuthContext";
+import SimpleLogin from "./simpleLogin";
 
-// Now we'll go back to using the proper app structure with routing
+// For now, let's use the direct SimpleLogin component to make sure it works
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>
+  <SimpleLogin />
 );
