@@ -19,7 +19,23 @@ function SimpleLogin() {
   
   // Check if user is already logged in with forced redirect approach
   useEffect(() => {
-    // Clear all redirection flags from previous sessions
+    // Check if we're in a redirection loop by looking at navigation timestamp
+    const lastNavAttempt = sessionStorage.getItem('LAST_NAV_ATTEMPT');
+    const now = new Date().getTime();
+    
+    if (lastNavAttempt) {
+      const lastTime = parseInt(lastNavAttempt);
+      // If we tried to redirect less than 2 seconds ago, don't try again
+      if (now - lastTime < 2000) {
+        console.log("SimpleLogin: Preventing redirection loop, throttling navigation attempts");
+        return;
+      }
+    }
+    
+    // Set navigation attempt timestamp to prevent loops
+    sessionStorage.setItem('LAST_NAV_ATTEMPT', now.toString());
+    
+    // Clear other redirection flags
     sessionStorage.removeItem('redirect_attempted');
     
     // Check for an active user ID
@@ -44,12 +60,15 @@ function SimpleLogin() {
           
           console.log("SimpleLogin: User auth check successful:", data);
           
-          // Perform a direct navigation without using React router
-          console.log("SimpleLogin: Performing forced navigation to home page");
-          
           // Set flags for home component to detect
           localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
           localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', new Date().getTime().toString());
+          
+          // Perform a direct navigation without using React router - ONCE
+          console.log("SimpleLogin: Performing one-time forced navigation to home page");
+          
+          // Set a flag specifically to prevent repeated redirects
+          sessionStorage.setItem('REDIRECT_IN_PROGRESS', 'true');
           
           // Force navigation with direct approach (most reliable)
           window.location.replace('/');
@@ -68,8 +87,26 @@ function SimpleLogin() {
   const redirectToHome = () => {
     console.log("SimpleLogin: Preparing enhanced home page redirect");
     
-    // Clear all session storage to avoid any redirection loops
-    sessionStorage.clear();
+    // Check if we've already attempted a redirect recently
+    const lastNavAttempt = sessionStorage.getItem('LAST_NAV_ATTEMPT');
+    const now = new Date().getTime();
+    
+    if (lastNavAttempt) {
+      const lastTime = parseInt(lastNavAttempt);
+      // If we tried to redirect less than 2 seconds ago, don't try again
+      if (now - lastTime < 2000) {
+        console.log("SimpleLogin: Preventing redirection loop in redirectToHome");
+        return;
+      }
+    }
+    
+    // Set navigation attempt timestamp to prevent loops
+    sessionStorage.setItem('LAST_NAV_ATTEMPT', now.toString());
+    sessionStorage.setItem('REDIRECT_IN_PROGRESS', 'true');
+    
+    // Remove other potential loop-causing flags
+    sessionStorage.removeItem('redirect_attempted');
+    sessionStorage.removeItem('router_redirect_attempted');
     
     // Verify user ID exists in localStorage 
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
@@ -98,9 +135,8 @@ function SimpleLogin() {
     document.body.appendChild(message);
     
     // Set success flags for the home component to detect
-    const timestamp = new Date().getTime();
     localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
-    localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
+    localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', now.toString());
     
     // Use minimal delay for better UX
     setTimeout(() => {
@@ -109,14 +145,6 @@ function SimpleLogin() {
         
         // Use location.replace for most reliable navigation with no history entry
         window.location.replace('/');
-        
-        // Use a fallback if the primary method doesn't trigger navigation after a short delay
-        setTimeout(() => {
-          if (window.location.pathname !== '/') {
-            console.log("SimpleLogin: Using fallback navigation method");
-            window.location.href = '/';
-          }
-        }, 300);
       } catch (e) {
         console.error("SimpleLogin: Redirect methods failed:", e);
         
