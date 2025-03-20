@@ -21,33 +21,12 @@ import Debug from "@/pages/debug";
 // Create a client
 const queryClient = new QueryClient();
 
-// Import the special force login page
-import ForceLoginPage from "@/pages/ForceLoginPage";
-
 function App() {
   const { toast } = useToast();
   const { isAuthenticated, user, loading } = useAuth();
   
-  console.log("App render. Auth state:", { isAuthenticated, loading, user: user?.id });
-  
   // Initialize native capabilities
-  useEffect(() => {
-    // Clear ALL redirection flags to ensure clean state
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.includes('REDIRECT')) {
-        localStorage.removeItem(key);
-      }
-    }
-    
-    // Clear ALL session storage redirection flags
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && (key.includes('redirect') || key.includes('REDIRECT'))) {
-        sessionStorage.removeItem(key);
-      }
-    }
-    
+  useEffect(() => {    
     // Initialize native capabilities
     initializeNativeCapabilities().catch((error: Error) => {
       toast({
@@ -58,11 +37,15 @@ function App() {
     });
   }, [toast]);
 
-  // SPECIAL DEMO MODE - Force the ForceLoginPage to display
-  // This will allow the user to log in and see the home page directly
+  // DEVELOPMENT MODE: Skip login and just show the app
+  // This makes it easier to focus on developing the app
   return (
-    <div className="h-screen flex flex-col">
-      <ForceLoginPage />
+    <div className="h-screen flex flex-col bg-gray-100">
+      <StatusBar />
+      <div className="flex-1 overflow-y-auto pb-24">
+        <Home />
+      </div>
+      <TabBar />
       <Toaster />
     </div>
   );
