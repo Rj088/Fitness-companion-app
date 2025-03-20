@@ -27,15 +27,18 @@ export function useWorkout(workoutId?: number) {
 // Get user workouts with optional date filter
 export function useWorkouts(options?: { date?: string }) {
   const { user } = useAuth();
+  // Use a default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
-  let endpoint = API_ENDPOINTS.WORKOUTS.USER(user?.id || 0);
+  let endpoint = API_ENDPOINTS.WORKOUTS.USER(userId);
   if (options?.date) {
     endpoint = `${endpoint}?date=${options.date}`;
   }
   
   return useQuery<UserWorkout[]>({
     queryKey: [endpoint],
-    enabled: !!user?.id,
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
 
@@ -47,7 +50,8 @@ export function useStartWorkout() {
   
   return useMutation({
     mutationFn: async ({ workoutId, date = new Date() }: { workoutId: number, date?: Date }) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Use default user ID (1) if no user is authenticated
+      const userId = user?.id || 1;
       
       const payload = {
         workoutId,
@@ -57,15 +61,17 @@ export function useStartWorkout() {
       
       const response = await apiRequest(
         "POST", 
-        API_ENDPOINTS.WORKOUTS.USER(user.id), 
+        API_ENDPOINTS.WORKOUTS.USER(userId), 
         payload
       );
       return response.json();
     },
     onSuccess: (data) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate user workouts queries
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.WORKOUTS.USER(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.WORKOUTS.USER(userId)] 
       });
       
       toast({
@@ -93,6 +99,7 @@ export function useCompleteWorkout() {
   
   return useMutation({
     mutationFn: async (userWorkoutId: number) => {
+      // No user check needed for completion as it works with the workout ID directly
       const response = await apiRequest(
         "PATCH", 
         API_ENDPOINTS.WORKOUTS.COMPLETE(userWorkoutId),
@@ -101,12 +108,14 @@ export function useCompleteWorkout() {
       return response.json();
     },
     onSuccess: (data) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate user workouts and activities queries
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.WORKOUTS.USER(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.WORKOUTS.USER(userId)] 
       });
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.ACTIVITIES.LIST(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.ACTIVITIES.LIST(userId)] 
       });
       
       toast({

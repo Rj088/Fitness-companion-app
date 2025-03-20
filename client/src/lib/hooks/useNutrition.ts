@@ -31,15 +31,18 @@ export function useFood(foodId?: number) {
 // Get user meals with optional date filter
 export function useUserMeals(options?: { date?: string }) {
   const { user } = useAuth();
+  // Use default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
-  let endpoint = API_ENDPOINTS.MEALS.LIST(user?.id || 0);
+  let endpoint = API_ENDPOINTS.MEALS.LIST(userId);
   if (options?.date) {
     endpoint = `${endpoint}?date=${options.date}`;
   }
   
   return useQuery<UserMeal[]>({
     queryKey: [endpoint],
-    enabled: !!user?.id,
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
 
@@ -56,7 +59,8 @@ export function useAddMeal() {
       mealType: "breakfast" | "lunch" | "dinner" | "snack",
       date?: Date 
     }) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Use default user ID (1) if no user is authenticated
+      const userId = user?.id || 1;
       
       const mealData = {
         ...payload,
@@ -65,15 +69,17 @@ export function useAddMeal() {
       
       const response = await apiRequest(
         "POST", 
-        API_ENDPOINTS.MEALS.CREATE(user.id), 
+        API_ENDPOINTS.MEALS.CREATE(userId), 
         mealData
       );
       return response.json();
     },
     onSuccess: (data) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate user meals queries
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.MEALS.LIST(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.MEALS.LIST(userId)] 
       });
       
       toast({
