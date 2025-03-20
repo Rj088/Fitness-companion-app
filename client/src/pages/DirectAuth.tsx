@@ -14,17 +14,12 @@ export default function DirectAuth() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Redirection function - direct to homepage
+  // ULTRA SIMPLE REDIRECTION - just force a reload
   const redirectToHome = () => {
-    console.log("DirectAuth: Authentication successful, redirecting to home...");
+    console.log("DirectAuth: Authentication successful, forcing reload...");
     
-    // Explicitly navigate to home page
-    setLocation("/");
-    
-    // As a fallback, also handle with direct navigation
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 100);
+    // Force a complete page reload - simplest and most reliable approach
+    window.location.href = "/";
   };
   
   const handleSubmit = async (e: React.FormEvent) => {

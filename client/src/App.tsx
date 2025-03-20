@@ -27,16 +27,23 @@ function App() {
   
   console.log("App render. Auth state:", { isAuthenticated, loading, user: user?.id });
   
-  // Remove any legacy redirection flags on startup
+  // Initialize native capabilities
   useEffect(() => {
-    // Clear all legacy redirection flags
-    localStorage.removeItem('LOGIN_REDIRECT_SUCCESS');
-    localStorage.removeItem('LOGIN_REDIRECT_TIMESTAMP');
-    localStorage.removeItem('force_home_redirect');
-    localStorage.removeItem('LAST_NAV_ATTEMPT');
-    sessionStorage.removeItem('REDIRECT_IN_PROGRESS');
-    sessionStorage.removeItem('redirect_attempted');
-    sessionStorage.removeItem('router_redirect_attempted');
+    // Clear ALL redirection flags to ensure clean state
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.includes('REDIRECT')) {
+        localStorage.removeItem(key);
+      }
+    }
+    
+    // Clear ALL session storage redirection flags
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key && (key.includes('redirect') || key.includes('REDIRECT'))) {
+        sessionStorage.removeItem(key);
+      }
+    }
     
     // Initialize native capabilities
     initializeNativeCapabilities().catch((error: Error) => {
@@ -59,8 +66,7 @@ function App() {
     );
   }
 
-  // Simple conditional rendering based on authentication state
-  // This avoids any redirection and ensures stable UI
+  // Simplified conditional rendering with no complex redirection
   if (!isAuthenticated) {
     console.log("App: User not authenticated, rendering auth page");
     
@@ -75,14 +81,15 @@ function App() {
     );
   }
 
-  // When authenticated, directly render the home page
-  console.log("App: User is authenticated, rendering home page directly");
+  // When authenticated, directly show the home page content
+  // No router, no redirects, just show the home page
+  console.log("App: User is authenticated, rendering home page");
   
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       <StatusBar />
       <div className="flex-1 overflow-y-auto pb-24">
-        <Router />
+        <Home />
       </div>
       <TabBar />
       <Toaster />
@@ -91,111 +98,16 @@ function App() {
 }
 
 function Router() {
-  const [location, setLocation] = useLocation();
-  const { isAuthenticated, loading } = useAuth();
-  const redirectAttemptedRef = useRef(false);
-
-  // Debug logging
-  console.log("Router render. Auth state:", { isAuthenticated, loading, location });
-
-  // One-time cleanup on component mount to prevent redirection issues
-  useEffect(() => {
-    // Reset the redirection flag in session storage
-    if (sessionStorage.getItem('router_redirect_attempted')) {
-      console.log("Router: Resetting redirection flags");
-      sessionStorage.removeItem('router_redirect_attempted');
-    }
-    
-    return () => {
-      // Cleanup on unmount
-      redirectAttemptedRef.current = false;
-    }
-  }, []);
-
-  // Redirect users based on authentication state - with protection against loops
-  useEffect(() => {
-    // Skip if already attempted to redirect this render cycle
-    if (redirectAttemptedRef.current) {
-      console.log("Router: Already attempted redirect in this session, skipping");
-      return;
-    }
-    
-    // Skip if still loading auth state
-    if (loading) {
-      console.log("Router: Still loading auth state, skipping redirects");
-      return;
-    }
-    
-    // Check for redirection flag in session storage
-    const routerRedirectAttempted = sessionStorage.getItem('router_redirect_attempted');
-    if (routerRedirectAttempted) {
-      console.log("Router: Redirect already attempted in session, preventing loop");
-      return;
-    }
-    
-    // Set flags to prevent multiple redirects
-    redirectAttemptedRef.current = true;
-    sessionStorage.setItem('router_redirect_attempted', 'true');
-    
-    const publicRoutes = ["/auth", "/debug", "/simple-auth"];
-    
-    // Handle redirect logic safely
-    try {
-      if (!isAuthenticated) {
-        // If user is not authenticated and not on a public route, redirect to auth
-        if (!publicRoutes.includes(location)) {
-          console.log("Router: Redirecting to auth page - not authenticated, current location:", location);
-          setLocation("/auth");
-        }
-      } else {
-        // If user is authenticated and on auth page, redirect to home
-        if (location === "/auth" || location === "/simple-auth") {
-          console.log("Router: Redirecting to home page - already authenticated");
-          setLocation("/");
-        }
-      }
-    } catch (error) {
-      console.error("Router: Navigation error:", error);
-      // Clear the flag on error
-      sessionStorage.removeItem('router_redirect_attempted');
-    }
-  }, [isAuthenticated, loading, location, setLocation]);
-
-  // Show loading indicator while checking authentication
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
-
-  // For the auth page or when not authenticated, directly render the DirectAuth component
+  // SIMPLIFIED ROUTER
+  // This is a simplified version with minimal redirections to avoid issues
+  const { isAuthenticated } = useAuth();
+  
   if (!isAuthenticated) {
-    if (location === "/auth" || location === "/") {
-      return <DirectAuth />;
-    } else {
-      // Redirect to auth for any non-auth routes when not authenticated
-      setLocation("/auth");
-      return <DirectAuth />;
-    }
+    return <DirectAuth />;
   }
-
-  // Protected routes handler
-  const renderProtectedComponent = (Component: React.ComponentType): JSX.Element => {
-    // No loading check needed here anymore as it's handled above
-    // No authentication check needed here anymore as it's handled above
-    return <Component />;
-  };
-
-  return (
-    <Switch>
-      <Route path="/" component={() => renderProtectedComponent(Home)} />
-      <Route path="/workouts" component={() => renderProtectedComponent(Workouts)} />
-      <Route path="/nutrition" component={() => renderProtectedComponent(Nutrition)} />
-      <Route path="/progress" component={() => renderProtectedComponent(Progress)} />
-      <Route path="/profile" component={() => renderProtectedComponent(Profile)} />
-      <Route path="/auth" component={DirectAuth} />
-      <Route path="/debug" component={Debug} />
-      <Route component={NotFound} />
-    </Switch>
-  );
+  
+  // If authenticated, just render home page directly
+  return <Home />;
 }
 
 export default function AppWithProviders() {
