@@ -99,6 +99,6 @@ A comprehensive fitness tracking application designed to provide an immersive an
 - Ensure you have the latest Xcode version
 - Check that iOS deployment target matches your device's iOS version
 
-## License
+## License    "Updated on [current date]"
 
 [MIT](LICENSE)
