@@ -39,6 +39,13 @@ export default function AIWorkoutRecommendation({
   const { user: authUser } = useAuth();
   const actualUser = user || authUser;
   
+  // Sync category state with the selectedCategory prop
+  useEffect(() => {
+    if (selectedCategory) {
+      setCategory(selectedCategory);
+    }
+  }, [selectedCategory]);
+  
   const generateWorkout = async () => {
     // Use default user data if user is not logged in
     const userForWorkout = actualUser || {
@@ -100,7 +107,7 @@ export default function AIWorkoutRecommendation({
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3">
               <i className="fas fa-robot text-white"></i>
             </div>
-            <CardTitle className="text-xl font-semibold">AI Workout Recommendation</CardTitle>
+            <CardTitle className="text-xl font-semibold">AI {category.charAt(0).toUpperCase() + category.slice(1)} Workout</CardTitle>
           </div>
           {!showGenerateForm && (
             <Button 
@@ -208,7 +215,7 @@ export default function AIWorkoutRecommendation({
             <div className="bg-blue-50 p-4 rounded-lg mb-4">
               <p className="text-sm text-blue-700">
                 <i className="fas fa-lightbulb mr-2"></i>
-                Based on your {user?.fitnessLevel || 'current'} fitness level and goals, we recommend:
+                Based on your {user?.fitnessLevel || 'current'} fitness level and {category} goals, we recommend:
               </p>
             </div>
             <WorkoutCard workout={displayWorkout} />
