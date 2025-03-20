@@ -101,15 +101,7 @@ export default function AINutritionRecommendation({
   };
   
   const generateMealPlan = async () => {
-    if (!user) {
-      toast({
-        title: "User profile required",
-        description: "Please complete your profile to get personalized recommendations",
-        variant: "destructive"
-      });
-      return;
-    }
-    
+    // Allow any user to generate a meal plan
     setIsGenerating(true);
     
     try {
@@ -234,7 +226,7 @@ export default function AINutritionRecommendation({
             
             <div className="flex justify-end space-x-2 pt-2">
               <Button
-                variant="primary"
+                variant="default"
                 onClick={generateMealPlan}
                 disabled={isGenerating}
                 className="bg-green-500 hover:bg-green-600 text-white"

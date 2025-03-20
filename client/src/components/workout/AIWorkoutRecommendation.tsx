@@ -36,23 +36,25 @@ export default function AIWorkoutRecommendation({
   const actualUser = user || authUser;
   
   const generateWorkout = async () => {
-    if (!actualUser) {
-      toast({
-        title: "User profile required",
-        description: "Please complete your profile to get personalized recommendations",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Use default user data if user is not logged in
+    const userForWorkout = actualUser || {
+      id: 0,
+      username: "guest",
+      firstName: "Guest",
+      fitnessLevel: "intermediate",
+      dailyStepsGoal: 10000,
+      workoutFrequency: 3,
+      createdAt: new Date()
+    };
     
     setIsGenerating(true);
     
     try {
-      console.log("Generating workout with user:", actualUser);
+      console.log("Generating workout with user:", userForWorkout);
       console.log("User preferences:", { goals, injuries, equipment });
       
       // Call the workout generation API
-      const response = await generateWorkoutRecommendation(actualUser, {
+      const response = await generateWorkoutRecommendation(userForWorkout, {
         goals,
         injuries,
         equipment
