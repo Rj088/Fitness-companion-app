@@ -24,24 +24,17 @@ const queryClient = new QueryClient();
 function App() {
   const { toast } = useToast();
   const { isAuthenticated, user, loading } = useAuth();
-
+  
+  // Remove any legacy redirection flags on startup
   useEffect(() => {
-    // Check for login redirect flags from simpleLogin component
-    const loginRedirectSuccess = localStorage.getItem('LOGIN_REDIRECT_SUCCESS');
-    
-    if (loginRedirectSuccess) {
-      console.log("App: Detected LOGIN_REDIRECT_SUCCESS flag");
-      // Don't remove the flag here, let Home component handle it
-    }
-    
-    // Check for deprecated redirect flag (backward compatibility)
-    const forceHomeRedirect = localStorage.getItem('force_home_redirect');
-    if (forceHomeRedirect) {
-      console.log("App: Detected force_home_redirect flag, redirecting to home");
-      localStorage.removeItem('force_home_redirect');
-      window.location.href = '/';
-      return;
-    }
+    // Clear all legacy redirection flags
+    localStorage.removeItem('LOGIN_REDIRECT_SUCCESS');
+    localStorage.removeItem('LOGIN_REDIRECT_TIMESTAMP');
+    localStorage.removeItem('force_home_redirect');
+    localStorage.removeItem('LAST_NAV_ATTEMPT');
+    sessionStorage.removeItem('REDIRECT_IN_PROGRESS');
+    sessionStorage.removeItem('redirect_attempted');
+    sessionStorage.removeItem('router_redirect_attempted');
     
     // Initialize native capabilities
     initializeNativeCapabilities().catch((error: Error) => {
@@ -64,9 +57,8 @@ function App() {
     );
   }
 
-  // Direct rendering approach - bypass router for more reliable navigation
-  
-  // Force redirect to login if not authenticated
+  // Simple conditional rendering based on authentication state
+  // This avoids any redirection and ensures stable UI
   if (!isAuthenticated) {
     console.log("App: User not authenticated, rendering auth page");
     
@@ -81,14 +73,13 @@ function App() {
     );
   }
 
-  // Direct rendering of the home page (bypassing router) when authenticated
+  // When authenticated, directly render the home page
   console.log("App: User is authenticated, rendering home page directly");
   
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       <StatusBar />
       <div className="flex-1 overflow-y-auto pb-24">
-        {/* Directly use the Home component instead of Router */}
         <Home />
       </div>
       <TabBar />

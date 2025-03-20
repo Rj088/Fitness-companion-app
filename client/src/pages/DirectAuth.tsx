@@ -14,47 +14,13 @@ export default function DirectAuth() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Improved redirection function with more direct approach
+  // Simplified redirection function - just reload the page
   const redirectToHome = () => {
-    console.log("DirectAuth: Preparing forced redirect to home page");
+    console.log("DirectAuth: Authentication successful, reloading page...");
     
-    // Clear any redirection flags in session storage
-    sessionStorage.clear();
-    
-    // Show visual confirmation
-    const message = document.createElement('div');
-    message.style.position = 'fixed';
-    message.style.top = '0';
-    message.style.left = '0';
-    message.style.width = '100%';
-    message.style.padding = '1rem';
-    message.style.backgroundColor = '#4CAF50';
-    message.style.color = 'white';
-    message.style.textAlign = 'center';
-    message.style.zIndex = '9999';
-    message.innerText = 'Authentication successful! Redirecting...';
-    document.body.appendChild(message);
-    
-    // Set flags for the Home component to detect
-    const timestamp = new Date().getTime();
-    localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
-    localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', timestamp.toString());
-    
-    // Use a shorter delay for better user experience
-    setTimeout(() => {
-      try {
-        console.log("DirectAuth: Executing direct homepage navigation");
-        
-        // Force the browser to do a full reload to reset all React state
-        window.open('/', '_self');
-        
-      } catch (e) {
-        console.error("DirectAuth: Redirect failed:", e);
-        
-        // Last resort emergency redirect
-        window.location.href = '/';
-      }
-    }, 500);
+    // No complex redirect logic - the App component will handle redirection based on auth state
+    // Simply reload the page to reflect the new authentication state
+    window.location.reload();
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
