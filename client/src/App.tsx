@@ -21,6 +21,9 @@ import Debug from "@/pages/debug";
 // Create a client
 const queryClient = new QueryClient();
 
+// Import the special force login page
+import ForceLoginPage from "@/pages/ForceLoginPage";
+
 function App() {
   const { toast } = useToast();
   const { isAuthenticated, user, loading } = useAuth();
@@ -55,43 +58,11 @@ function App() {
     });
   }, [toast]);
 
-  // Show loading indicator
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <p className="mb-2">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Simplified conditional rendering with no complex redirection
-  if (!isAuthenticated) {
-    console.log("App: User not authenticated, rendering auth page");
-    
-    return (
-      <div className="h-screen flex flex-col bg-gray-100">
-        <StatusBar />
-        <div className="flex-1 overflow-y-auto">
-          <DirectAuth />
-        </div>
-        <Toaster />
-      </div>
-    );
-  }
-
-  // When authenticated, directly show the home page content
-  // No router, no redirects, just show the home page
-  console.log("App: User is authenticated, rendering home page");
-  
+  // SPECIAL DEMO MODE - Force the ForceLoginPage to display
+  // This will allow the user to log in and see the home page directly
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
-      <StatusBar />
-      <div className="flex-1 overflow-y-auto pb-24">
-        <Home />
-      </div>
-      <TabBar />
+    <div className="h-screen flex flex-col">
+      <ForceLoginPage />
       <Toaster />
     </div>
   );
