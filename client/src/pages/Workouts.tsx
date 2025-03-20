@@ -245,11 +245,52 @@ export default function Workouts() {
           </TabsContent>
           
           <TabsContent value="ai">
+            {/* Workout Categories for AI Tab */}
+            <div className="flex space-x-3 overflow-x-auto py-2 scrollbar-hide">
+              <Button
+                variant={category === "strength" ? "default" : "outline"}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium ${
+                  category === "strength" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
+                }`}
+                onClick={() => setCategory("strength")}
+              >
+                Strength
+              </Button>
+              <Button
+                variant={category === "cardio" ? "default" : "outline"}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium ${
+                  category === "cardio" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
+                }`}
+                onClick={() => setCategory("cardio")}
+              >
+                Cardio
+              </Button>
+              <Button
+                variant={category === "flexibility" ? "default" : "outline"}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium ${
+                  category === "flexibility" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
+                }`}
+                onClick={() => setCategory("flexibility")}
+              >
+                Flexibility
+              </Button>
+              <Button
+                variant={category === "hiit" ? "default" : "outline"}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium ${
+                  category === "hiit" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
+                }`}
+                onClick={() => setCategory("hiit")}
+              >
+                HIIT
+              </Button>
+            </div>
+            
             {/* AI Workout Recommendation */}
             <AIWorkoutRecommendation 
               user={user} 
               aiWorkouts={aiWorkouts}
               isLoading={isLoading}
+              selectedCategory={category as 'strength' | 'cardio' | 'flexibility' | 'hiit'}
             />
             
             {/* Personalized for You */}

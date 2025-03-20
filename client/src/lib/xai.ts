@@ -13,6 +13,7 @@ export async function generateWorkoutRecommendation(
     goals?: string;
     injuries?: string;
     equipment?: string;
+    category?: 'strength' | 'cardio' | 'flexibility' | 'hiit';
   }
 ): Promise<string> {
   // Use a direct implementation that doesn't rely on an API
@@ -25,40 +26,231 @@ export async function generateWorkoutRecommendation(
   // Add a slight delay to simulate API processing
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Generate a JSON response directly
+  // Determine workout category - use specified category or infer from goals
+  const workoutCategory = preferences.category || 
+    (preferences.goals?.includes('strength') ? 'strength' : 
+     preferences.goals?.includes('cardio') ? 'cardio' : 
+     preferences.goals?.includes('flexibility') ? 'flexibility' :
+     preferences.goals?.includes('hiit') ? 'hiit' : 'strength');
+  
+  // Create different exercise sets based on workout category
+  let exercises = [];
+  let workoutName = '';
+  let workoutDescription = '';
+  let duration = user.fitnessLevel === 'beginner' ? 30 : user.fitnessLevel === 'intermediate' ? 45 : 60;
+  let caloriesBurned = user.fitnessLevel === 'beginner' ? 200 : user.fitnessLevel === 'intermediate' ? 350 : 500;
+  
+  switch (workoutCategory) {
+    case 'cardio':
+      workoutName = 'AI Personalized Cardio Workout';
+      workoutDescription = `This cardio workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "endurance"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "basic"} equipment.`;
+      caloriesBurned += 100; // Cardio typically burns more calories
+      exercises = [
+        {
+          name: "Jumping Jacks",
+          sets: 3,
+          duration: 60,
+          description: "Full body cardio warm-up"
+        },
+        {
+          name: "High Knees",
+          sets: 3,
+          duration: 45,
+          description: "Rapid knee lifts to elevate heart rate"
+        },
+        {
+          name: preferences.injuries?.includes('knee') ? "Seated Punches" : "Mountain Climbers",
+          sets: 3,
+          duration: 45,
+          description: "Dynamic cardio movement"
+        },
+        {
+          name: "Burpees",
+          sets: 3,
+          reps: user.fitnessLevel === 'beginner' ? 8 : user.fitnessLevel === 'intermediate' ? 12 : 15,
+          description: "Full body explosive movement"
+        },
+        {
+          name: "Jump Rope",
+          sets: 2,
+          duration: 60,
+          description: "Continuous jumping for endurance"
+        }
+      ];
+      break;
+      
+    case 'strength':
+      workoutName = 'AI Personalized Strength Workout';
+      workoutDescription = `This strength workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "muscle building"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "basic"} equipment.`;
+      exercises = [
+        {
+          name: "Push-ups",
+          sets: 4,
+          reps: user.fitnessLevel === 'beginner' ? 8 : user.fitnessLevel === 'intermediate' ? 12 : 15,
+          description: "Upper body compound movement"
+        },
+        {
+          name: preferences.equipment?.includes('dumbbell') ? "Dumbbell Shoulder Press" : "Pike Push-ups",
+          sets: 3,
+          reps: 10,
+          description: "Shoulder strengthening exercise"
+        },
+        {
+          name: preferences.injuries?.includes('knee') ? "Seated Curls" : "Squats",
+          sets: 4,
+          reps: 12,
+          description: "Lower body compound movement"
+        },
+        {
+          name: preferences.equipment?.includes('dumbbell') ? "Dumbbell Rows" : "Bodyweight Rows",
+          sets: 3,
+          reps: 12,
+          description: "Back strengthening pull exercise"
+        },
+        {
+          name: "Plank",
+          sets: 3,
+          duration: 45,
+          description: "Core stability exercise"
+        }
+      ];
+      break;
+      
+    case 'flexibility':
+      workoutName = 'AI Personalized Flexibility Workout';
+      workoutDescription = `This flexibility workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "mobility"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "minimal"} equipment.`;
+      caloriesBurned -= 50; // Flexibility workouts typically burn fewer calories
+      exercises = [
+        {
+          name: "Dynamic Stretching Warm-up",
+          sets: 1,
+          duration: 180,
+          description: "Gentle movement to prepare the body"
+        },
+        {
+          name: "Downward Dog to Upward Dog Flow",
+          sets: 3,
+          reps: 10,
+          description: "Yoga flow for spine mobility"
+        },
+        {
+          name: preferences.injuries?.includes('back') ? "Modified Forward Fold" : "Standing Forward Fold",
+          sets: 3,
+          duration: 30,
+          description: "Hamstring and lower back stretch"
+        },
+        {
+          name: "Pigeon Pose",
+          sets: 2,
+          duration: 60,
+          description: "Hip opener (each side)"
+        },
+        {
+          name: "Child's Pose to Cobra Flow",
+          sets: 3,
+          reps: 8,
+          description: "Spine mobility and flexibility"
+        },
+        {
+          name: "Full Body Relaxation",
+          sets: 1,
+          duration: 180,
+          description: "Final relaxation and breathing"
+        }
+      ];
+      break;
+      
+    case 'hiit':
+      workoutName = 'AI Personalized HIIT Workout';
+      workoutDescription = `This high-intensity interval training workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "fat burning"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "minimal"} equipment.`;
+      caloriesBurned += 150; // HIIT typically burns more calories
+      exercises = [
+        {
+          name: "Warm-up Jog in Place",
+          sets: 1,
+          duration: 120,
+          description: "Light cardio to raise heart rate"
+        },
+        {
+          name: "Burpees",
+          sets: 4,
+          duration: 30,
+          description: "High intensity with 30 sec rest between sets"
+        },
+        {
+          name: preferences.injuries?.includes('knee') ? "Modified Jumping Jacks" : "Jumping Lunges",
+          sets: 4,
+          duration: 30,
+          description: "Explosive leg movement with 30 sec rest"
+        },
+        {
+          name: "Mountain Climbers",
+          sets: 4,
+          duration: 30,
+          description: "Core and cardio with 30 sec rest"
+        },
+        {
+          name: preferences.equipment?.includes('dumbbell') ? "Dumbbell Thrusters" : "Squat Jumps",
+          sets: 4,
+          duration: 30,
+          description: "Full body power with 30 sec rest"
+        },
+        {
+          name: "Plank to Push-up",
+          sets: 4,
+          duration: 30,
+          description: "Upper body strength with 30 sec rest"
+        },
+        {
+          name: "Cool Down",
+          sets: 1,
+          duration: 180,
+          description: "Gradual heart rate reduction and stretching"
+        }
+      ];
+      break;
+      
+    default:
+      // Default to a general workout if no specific category
+      workoutName = `AI Personalized ${(preferences.goals ? preferences.goals.charAt(0).toUpperCase() + preferences.goals.slice(1) : "Fitness")} Workout`;
+      workoutDescription = `This workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "general fitness"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "basic"} equipment.`;
+      exercises = [
+        {
+          name: preferences.goals?.includes('strength') ? 'Dumbbell Curls' : 'Jumping Jacks',
+          sets: 3,
+          reps: 12,
+          description: "Maintain proper form throughout the exercise"
+        },
+        {
+          name: preferences.equipment?.includes('dumbbell') ? 'Dumbbell Press' : 'Push-ups',
+          sets: 3,
+          reps: 10,
+          description: "Focus on full range of motion"
+        },
+        {
+          name: preferences.injuries?.includes('knee') ? 'Seated Shoulder Press' : 'Squats',
+          sets: 3,
+          reps: 15,
+          description: "Keep your back straight and go at your own pace"
+        },
+        {
+          name: "Plank",
+          sets: 3,
+          duration: 30,
+          description: "Hold position with core engaged"
+        }
+      ];
+  }
+  
+  // Generate complete workout JSON
   const workoutJson = {
-    name: `AI Personalized ${(preferences.goals ? preferences.goals.charAt(0).toUpperCase() + preferences.goals.slice(1) : "Fitness")} Workout`,
-    description: `This workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "general fitness"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "basic"} equipment.`,
-    duration: user.fitnessLevel === 'beginner' ? 30 : user.fitnessLevel === 'intermediate' ? 45 : 60,
+    name: workoutName,
+    description: workoutDescription,
+    duration,
     difficulty: user.fitnessLevel,
-    caloriesBurned: user.fitnessLevel === 'beginner' ? 200 : user.fitnessLevel === 'intermediate' ? 350 : 500,
-    category: preferences.goals?.includes('strength') ? 'strength' : preferences.goals?.includes('cardio') ? 'cardio' : 'strength',
-    exercises: [
-      {
-        name: preferences.goals?.includes('strength') ? 'Dumbbell Curls' : 'Jumping Jacks',
-        sets: 3,
-        reps: 12,
-        description: "Maintain proper form throughout the exercise"
-      },
-      {
-        name: preferences.equipment?.includes('dumbbell') ? 'Dumbbell Press' : 'Push-ups',
-        sets: 3,
-        reps: 10,
-        description: "Focus on full range of motion"
-      },
-      {
-        name: preferences.injuries?.includes('knee') ? 'Seated Shoulder Press' : 'Squats',
-        sets: 3,
-        reps: 15,
-        description: "Keep your back straight and go at your own pace"
-      },
-      {
-        name: "Plank",
-        sets: 3,
-        duration: 30,
-        description: "Hold position with core engaged"
-      }
-    ]
+    caloriesBurned,
+    category: workoutCategory,
+    exercises
   };
   
   // Return as JSON string

@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Workout } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WorkoutCard } from "@/components/workout/WorkoutPlan";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateWorkoutRecommendation, parseWorkoutResponse } from "@/lib/xai";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
@@ -16,18 +17,21 @@ interface AIWorkoutRecommendationProps {
   user?: User | null;
   aiWorkouts?: Workout[];
   isLoading?: boolean;
+  selectedCategory?: 'strength' | 'cardio' | 'flexibility' | 'hiit';
 }
 
 export default function AIWorkoutRecommendation({ 
   user, 
   aiWorkouts = [], 
-  isLoading = false 
+  isLoading = false,
+  selectedCategory = 'strength'
 }: AIWorkoutRecommendationProps) {
   const { toast } = useToast();
   const [showGenerateForm, setShowGenerateForm] = useState(false);
   const [goals, setGoals] = useState("build muscle");
   const [injuries, setInjuries] = useState("none");
   const [equipment, setEquipment] = useState("dumbbells");
+  const [category, setCategory] = useState<'strength' | 'cardio' | 'flexibility' | 'hiit'>(selectedCategory);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedWorkout, setGeneratedWorkout] = useState<Workout | null>(null);
   
@@ -51,13 +55,14 @@ export default function AIWorkoutRecommendation({
     
     try {
       console.log("Generating workout with user:", userForWorkout);
-      console.log("User preferences:", { goals, injuries, equipment });
+      console.log("User preferences:", { goals, injuries, equipment, category });
       
       // Call the workout generation API
       const response = await generateWorkoutRecommendation(userForWorkout, {
         goals,
         injuries,
-        equipment
+        equipment,
+        category
       });
       
       console.log("AI response:", response);
@@ -70,7 +75,7 @@ export default function AIWorkoutRecommendation({
       
       toast({
         title: "Workout Generated",
-        description: "Your personalized workout plan is ready"
+        description: `Your personalized ${category} workout plan is ready`
       });
     } catch (error) {
       console.error("Error generating workout:", error);
@@ -145,6 +150,24 @@ export default function AIWorkoutRecommendation({
                 onChange={(e) => setEquipment(e.target.value)}
                 className="resize-none"
               />
+            </div>
+            
+            <div>
+              <Label htmlFor="category" className="text-sm font-medium mb-1 block">Workout Type</Label>
+              <Select
+                value={category}
+                onValueChange={(value) => setCategory(value as 'strength' | 'cardio' | 'flexibility' | 'hiit')}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select workout type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strength">Strength</SelectItem>
+                  <SelectItem value="cardio">Cardio</SelectItem>
+                  <SelectItem value="flexibility">Flexibility</SelectItem>
+                  <SelectItem value="hiit">HIIT</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="flex justify-end space-x-2 pt-2">
