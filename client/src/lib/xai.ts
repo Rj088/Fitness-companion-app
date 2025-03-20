@@ -1,4 +1,4 @@
-import { User, Workout } from "./types";
+import { User, Workout, Exercise } from "./types";
 
 // Check if xAI API key is available
 const hasXaiKey = typeof import.meta.env.VITE_XAI_API_KEY === 'string' && 
@@ -27,7 +27,7 @@ export async function generateWorkoutRecommendation(
   
   // Generate a JSON response directly
   const workoutJson = {
-    name: `AI Personalized ${preferences.goals?.charAt(0).toUpperCase() + preferences.goals?.slice(1) || "Fitness"} Workout`,
+    name: `AI Personalized ${(preferences.goals ? preferences.goals.charAt(0).toUpperCase() + preferences.goals.slice(1) : "Fitness")} Workout`,
     description: `This workout is designed for a ${user.fitnessLevel} with ${preferences.goals || "general fitness"} goals, considering ${preferences.injuries || "no"} injuries, using ${preferences.equipment || "basic"} equipment.`,
     duration: user.fitnessLevel === 'beginner' ? 30 : user.fitnessLevel === 'intermediate' ? 45 : 60,
     difficulty: user.fitnessLevel,
@@ -147,7 +147,6 @@ function generateSimulatedResponse(
 }
 
 // XAI functions for workout generation
-import { User, Workout } from "./types";
 
 export async function generateWorkoutRecommendationAI(user: User, preferences: {
   goals: string;
@@ -172,7 +171,7 @@ export async function generateWorkoutRecommendationAI(user: User, preferences: {
     "duration": ${fitnessLevel === 'beginner' ? 30 : fitnessLevel === 'intermediate' ? 45 : 60},
     "difficulty": "${fitnessLevel}",
     "caloriesBurned": ${fitnessLevel === 'beginner' ? 200 : fitnessLevel === 'intermediate' ? 350 : 500},
-    "category": "${userGoals.includes('strength') ? 'strength' : userGoals.includes('cardio') ? 'cardio' : 'full body'}",
+    "category": "${userGoals.includes('strength') ? 'strength' : userGoals.includes('cardio') ? 'cardio' : userGoals.includes('flexibility') ? 'flexibility' : 'strength'}",
     "exercises": [
       {
         "name": "${userGoals.includes('strength') ? 'Dumbbell Curls' : 'Jumping Jacks'}",
@@ -207,6 +206,12 @@ export async function generateWorkoutRecommendationAI(user: User, preferences: {
 export function parseWorkoutResponse(aiResponse: string): Workout {
   try {
     const parsedResponse = JSON.parse(aiResponse);
+    
+    // Add missing IDs to exercises if needed
+    const exercises = parsedResponse.exercises.map((exercise: any, index: number) => ({
+      id: exercise.id || index + 1,
+      ...exercise
+    }));
 
     return {
       id: Math.floor(Math.random() * 10000),
@@ -216,8 +221,8 @@ export function parseWorkoutResponse(aiResponse: string): Workout {
       duration: parsedResponse.duration,
       caloriesBurned: parsedResponse.caloriesBurned,
       difficulty: parsedResponse.difficulty,
-      category: parsedResponse.category,
-      exercises: parsedResponse.exercises
+      category: parsedResponse.category === "full body" ? "strength" : parsedResponse.category,
+      exercises
     };
   } catch (error) {
     console.error("Error parsing AI response:", error);
@@ -229,25 +234,31 @@ export function parseWorkoutResponse(aiResponse: string): Workout {
       duration: 30,
       caloriesBurned: 300,
       difficulty: "intermediate",
-      category: "full body",
+      category: "strength",
       exercises: [
         {
+          id: 1,
           name: "Push-ups",
           duration: 5,
           sets: 3,
-          reps: 10
+          reps: 10,
+          description: "Standard push-ups"
         },
         {
+          id: 2,
           name: "Squats",
           duration: 5,
           sets: 3,
-          reps: 15
+          reps: 15,
+          description: "Bodyweight squats"
         },
         {
+          id: 3,
           name: "Plank",
-          duration: 5,
+          duration: 30,
           sets: 3,
-          reps: 1
+          reps: 1,
+          description: "Core exercise"
         }
       ]
     };

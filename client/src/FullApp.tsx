@@ -323,17 +323,17 @@ window.useAuth = () => {
   };
 };
 
-// Set up mock implementation for AI workout generation
-import { generateWorkoutRecommendationAI, parseWorkoutResponse } from "@/lib/xai";
+// Set up real implementation for AI workout generation
+import { generateWorkoutRecommendation as generateWorkout, parseWorkoutResponse } from "@/lib/xai";
+import userStore from "@/store/userStore";
 
-// Mock implementation for AI workout recommendation
+// Global implementation for AI workout recommendation
 //@ts-ignore
-window.generateWorkoutRecommendation = async (user: User, preferences: any) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  return generateWorkoutRecommendationAI(user, preferences);
-};
+window.generateWorkoutRecommendation = generateWorkout;
+
+// Make user store available globally for iOS
+//@ts-ignore
+window.userStore = userStore;
 
 //@ts-ignore
 window.useUser = () => {
