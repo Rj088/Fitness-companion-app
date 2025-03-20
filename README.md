@@ -9,6 +9,7 @@ A comprehensive fitness tracking application designed to provide an immersive an
 - **Progress Tracking**: Track your workout history and fitness progress over time
 - **Nutrition Monitoring**: Log meals and monitor nutritional intake
 - **Cross-Platform**: Works on web and iOS devices using Capacitor
+- **No-Login Experience**: Instantly access all features without requiring account creation
 
 ## Tech Stack
 
@@ -62,6 +63,41 @@ A comprehensive fitness tracking application designed to provide an immersive an
 - `server/`: Express.js backend
 - `shared/`: Shared types and utilities
 - `ios/`: iOS application files
+
+## iOS Development Notes
+
+### Building for iOS
+
+1. Make sure your environment is set up correctly:
+   ```bash
+   npm install -g @capacitor/cli
+   ```
+
+2. Build the web assets:
+   ```bash
+   npm run build
+   ```
+
+3. Update iOS project:
+   ```bash
+   npx cap sync ios
+   ```
+
+4. Open Xcode project:
+   ```bash
+   npx cap open ios
+   ```
+
+5. In Xcode:
+   - Set your development team in the Signing & Capabilities tab
+   - Select your target device
+   - Press the Run button
+
+### Troubleshooting iOS Build
+
+- If you encounter build errors, try cleaning the build folder in Xcode (Product > Clean Build Folder)
+- Ensure you have the latest Xcode version
+- Check that iOS deployment target matches your device's iOS version
 
 ## License
 
