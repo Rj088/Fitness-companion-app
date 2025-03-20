@@ -10,6 +10,7 @@ import { generateWorkoutRecommendation, parseWorkoutResponse } from "@/lib/xai";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/lib/context/AuthContext";
 
 interface AIWorkoutRecommendationProps {
   user?: User | null;
@@ -24,14 +25,18 @@ export default function AIWorkoutRecommendation({
 }: AIWorkoutRecommendationProps) {
   const { toast } = useToast();
   const [showGenerateForm, setShowGenerateForm] = useState(false);
-  const [goals, setGoals] = useState("");
-  const [injuries, setInjuries] = useState("");
-  const [equipment, setEquipment] = useState("");
+  const [goals, setGoals] = useState("build muscle");
+  const [injuries, setInjuries] = useState("none");
+  const [equipment, setEquipment] = useState("dumbbells");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedWorkout, setGeneratedWorkout] = useState<Workout | null>(null);
   
+  // Import useAuth hook to get authenticated user
+  const { user: authUser } = useAuth();
+  const actualUser = user || authUser;
+  
   const generateWorkout = async () => {
-    if (!user) {
+    if (!actualUser) {
       toast({
         title: "User profile required",
         description: "Please complete your profile to get personalized recommendations",
@@ -43,13 +48,22 @@ export default function AIWorkoutRecommendation({
     setIsGenerating(true);
     
     try {
-      const response = await generateWorkoutRecommendation(user, {
+      console.log("Generating workout with user:", actualUser);
+      console.log("User preferences:", { goals, injuries, equipment });
+      
+      // Call the workout generation API
+      const response = await generateWorkoutRecommendation(actualUser, {
         goals,
         injuries,
         equipment
       });
       
+      console.log("AI response:", response);
+      
+      // Parse the response into a workout object
       const workout = parseWorkoutResponse(response);
+      console.log("Parsed workout:", workout);
+      
       setGeneratedWorkout(workout);
       
       toast({
@@ -133,7 +147,7 @@ export default function AIWorkoutRecommendation({
             
             <div className="flex justify-end space-x-2 pt-2">
               <Button
-                variant="primary"
+                variant="default"
                 onClick={generateWorkout}
                 disabled={isGenerating}
                 className="bg-blue-500 hover:bg-blue-600 text-white"
