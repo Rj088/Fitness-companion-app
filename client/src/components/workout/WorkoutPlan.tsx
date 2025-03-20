@@ -70,6 +70,8 @@ export default function WorkoutPlan({ workout }: WorkoutPlanProps) {
 }
 
 export const WorkoutCard = ({ workout }: { workout: any }) => {
+  // Add proper typing for exercises
+  type WorkoutExercise = Exercise;
   const { toast } = useToast();
   const [saved, setSaved] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -229,7 +231,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
               </div>
 
               <div className="border rounded-lg divide-y">
-                {workout.exercises.map((exercise, index) => (
+                {workout.exercises.map((exercise: Exercise, index: number) => (
                   <div 
                     key={index} 
                     className={`flex items-center justify-between p-3 ${index === currentExercise ? 'bg-blue-50' : ''}`}
@@ -286,7 +288,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
                   Exercises
                 </div>
                 <div className="divide-y">
-                  {workout.exercises?.map((exercise, index) => (
+                  {workout.exercises?.map((exercise: Exercise, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3">
                       <div className="flex items-center">
                         <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center mr-3">
@@ -304,11 +306,11 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
 
               <div className="flex justify-between">
                 <Button variant="outline">
-                  <i className="far fa-bookmark mr-2"></i>
+                  <Bookmark className="h-4 w-4 mr-2" />
                   Save for Later
                 </Button>
                 <Button onClick={startWorkout}>
-                  <i className="fas fa-play-circle mr-2"></i>
+                  <PlayCircle className="h-4 w-4 mr-2" />
                   Start Workout
                 </Button>
               </div>
@@ -328,29 +330,29 @@ export const RecentWorkout = ({ workout }: { workout: any }) => {
   const getCategoryInfo = () => {
     // Check for specific workout types based on name/description
     if (name?.toLowerCase().includes('chest') || description?.toLowerCase().includes('chest')) {
-      return { icon: 'fas fa-dumbbell', color: 'text-blue-600', bg: 'bg-blue-100' };
+      return { icon: <Dumbbell className="h-5 w-5 text-blue-600" />, bg: 'bg-blue-100' };
     }
     if (name?.toLowerCase().includes('back') || description?.toLowerCase().includes('back')) {
-      return { icon: 'fas fa-dumbbell', color: 'text-indigo-600', bg: 'bg-indigo-100' };
+      return { icon: <Dumbbell className="h-5 w-5 text-indigo-600" />, bg: 'bg-indigo-100' };
     }
     if (name?.toLowerCase().includes('bicep') || description?.toLowerCase().includes('bicep')) {
-      return { icon: 'fas fa-dumbbell', color: 'text-purple-600', bg: 'bg-purple-100' };
+      return { icon: <Dumbbell className="h-5 w-5 text-purple-600" />, bg: 'bg-purple-100' };
     }
     if (name?.toLowerCase().includes('crossfit') || description?.toLowerCase().includes('crossfit')) {
-      return { icon: 'fas fa-fire-alt', color: 'text-red-600', bg: 'bg-red-100' };
+      return { icon: <Flame className="h-5 w-5 text-red-600" />, bg: 'bg-red-100' };
     }
     if (name?.toLowerCase().includes('ai') || name?.toLowerCase().includes('smart')) {
-      return { icon: 'fas fa-robot', color: 'text-blue-500', bg: 'bg-blue-100' };
+      return { icon: <Dumbbell className="h-5 w-5 text-blue-500" />, bg: 'bg-blue-100' };
     }
 
     // Default categories
     const cat = category?.toLowerCase() || 'strength';
     switch(cat) {
-      case 'strength': return { icon: 'fas fa-dumbbell', color: 'text-primary', bg: 'bg-primary/10' };
-      case 'cardio': return { icon: 'fas fa-running', color: 'text-secondary', bg: 'bg-secondary/10' };
-      case 'hiit': return { icon: 'fas fa-heartbeat', color: 'text-accent', bg: 'bg-accent/10' };
-      case 'flexibility': return { icon: 'fas fa-child', color: 'text-green-500', bg: 'bg-green-100' };
-      default: return { icon: 'fas fa-dumbbell', color: 'text-primary', bg: 'bg-primary/10' };
+      case 'strength': return { icon: <Dumbbell className="h-5 w-5 text-primary" />, bg: 'bg-primary/10' };
+      case 'cardio': return { icon: <Dumbbell className="h-5 w-5 text-secondary" />, bg: 'bg-secondary/10' };
+      case 'hiit': return { icon: <Dumbbell className="h-5 w-5 text-accent" />, bg: 'bg-accent/10' };
+      case 'flexibility': return { icon: <Dumbbell className="h-5 w-5 text-green-500" />, bg: 'bg-green-100' };
+      default: return { icon: <Dumbbell className="h-5 w-5 text-primary" />, bg: 'bg-primary/10' };
     }
   };
 
@@ -359,7 +361,7 @@ export const RecentWorkout = ({ workout }: { workout: any }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 flex items-center">
       <div className={`w-12 h-12 rounded-full ${categoryInfo.bg} flex items-center justify-center mr-4`}>
-        <i className={`${categoryInfo.icon} ${categoryInfo.color}`}></i>
+        {categoryInfo.icon}
       </div>
       <div className="flex-1">
         <h3 className="font-medium">{name}</h3>
@@ -368,7 +370,7 @@ export const RecentWorkout = ({ workout }: { workout: any }) => {
         </p>
       </div>
       <button className="text-gray-400">
-        <i className="fas fa-redo"></i>
+        <Redo className="h-4 w-4" />
       </button>
     </div>
   );
