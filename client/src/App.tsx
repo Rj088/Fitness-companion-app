@@ -25,6 +25,8 @@ function App() {
   const { toast } = useToast();
   const { isAuthenticated, user, loading } = useAuth();
   
+  console.log("App render. Auth state:", { isAuthenticated, loading, user: user?.id });
+  
   // Remove any legacy redirection flags on startup
   useEffect(() => {
     // Clear all legacy redirection flags
@@ -80,7 +82,7 @@ function App() {
     <div className="h-screen flex flex-col bg-gray-100">
       <StatusBar />
       <div className="flex-1 overflow-y-auto pb-24">
-        <Home />
+        <Router />
       </div>
       <TabBar />
       <Toaster />
