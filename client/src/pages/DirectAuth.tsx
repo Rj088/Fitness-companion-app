@@ -14,13 +14,17 @@ export default function DirectAuth() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Simplified redirection function - just reload the page
+  // Redirection function - direct to homepage
   const redirectToHome = () => {
-    console.log("DirectAuth: Authentication successful, reloading page...");
+    console.log("DirectAuth: Authentication successful, redirecting to home...");
     
-    // No complex redirect logic - the App component will handle redirection based on auth state
-    // Simply reload the page to reflect the new authentication state
-    window.location.reload();
+    // Explicitly navigate to home page
+    setLocation("/");
+    
+    // As a fallback, also handle with direct navigation
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 100);
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
