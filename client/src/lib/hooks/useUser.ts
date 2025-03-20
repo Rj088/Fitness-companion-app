@@ -8,10 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 // Get current user data
 export function useUser() {
   const { user } = useAuth();
+  // Use default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
   return useQuery<User>({
-    queryKey: [API_ENDPOINTS.USERS.GET(user?.id || 0)],
-    enabled: !!user?.id,
+    queryKey: [API_ENDPOINTS.USERS.GET(userId)],
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
 
@@ -23,19 +26,22 @@ export function useUpdateUser() {
   
   return useMutation({
     mutationFn: async (userData: Partial<User>) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Use default user ID (1) if no user is authenticated
+      const userId = user?.id || 1;
       
       const response = await apiRequest(
         "PATCH", 
-        API_ENDPOINTS.USERS.UPDATE(user.id), 
+        API_ENDPOINTS.USERS.UPDATE(userId), 
         userData
       );
       return response.json();
     },
     onSuccess: (updatedUser) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.USERS.GET(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.USERS.GET(userId)] 
       });
       
       toast({
