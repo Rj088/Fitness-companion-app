@@ -397,7 +397,7 @@ const MockProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         id: mockWeightLogs.length + 1,
         userId: mockUser.id,
         date: log.date || new Date(),
-        weight: log.weight || mockUser.weight
+        weight: log.weight || mockUser.weight || 70 // Provide a default weight
       };
       mockWeightLogs.push(newLog);
       return newLog;
