@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Login function
+  // Login function - SIMPLIFIED VERSION WITH GUARANTEED PAGE RELOAD
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     setState({
       ...state,
@@ -142,6 +142,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = await response.json();
       console.log("Login successful, received user:", user);
 
+      // CRITICAL: Store user ID in localStorage before reload
+      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
+      
+      // Also store a LOGIN_SUCCESS flag to ensure we reload properly
+      localStorage.setItem('LOGIN_SUCCESS', 'true');
+      localStorage.setItem('LOGIN_TIMESTAMP', new Date().getTime().toString());
+      
+      // Update state now, just in case the page doesn't reload
       setState({
         isAuthenticated: true,
         user,
@@ -149,13 +157,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         error: null,
       });
 
-      // Store user ID in localStorage
-      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
-
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.firstName}!`,
       });
+      
+      // SUCCESS! Force reload to ensure clean app state
+      console.log("Login successful, forcing page reload");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
 
       return true;
     } catch (error: any) {
@@ -177,7 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Register function
+  // Register function - SIMPLIFIED WITH GUARANTEED PAGE RELOAD
   const register = async (userData: any): Promise<boolean> => {
     setState({
       ...state,
@@ -204,6 +215,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = await response.json();
       console.log("Registration successful, received user:", user);
 
+      // CRITICAL: Store user ID in localStorage before reload
+      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
+      
+      // Also store a REGISTER_SUCCESS flag to ensure we reload properly
+      localStorage.setItem('REGISTER_SUCCESS', 'true');
+      localStorage.setItem('REGISTER_TIMESTAMP', new Date().getTime().toString());
+      
+      // Update state now, just in case the page doesn't reload
       setState({
         isAuthenticated: true,
         user,
@@ -211,13 +230,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         error: null,
       });
 
-      // Store user ID in localStorage
-      localStorage.setItem(STORAGE_KEYS.USER_ID, user.id.toString());
-
       toast({
         title: "Registration successful",
         description: `Welcome, ${user.firstName}!`,
       });
+      
+      // SUCCESS! Force reload to ensure clean app state
+      console.log("Registration successful, forcing page reload");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
 
       return true;
     } catch (error: any) {
