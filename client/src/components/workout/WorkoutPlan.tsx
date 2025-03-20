@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { UserWorkout } from "@/lib/types";
+import { UserWorkout, Exercise } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Dumbbell, Clock, ArrowRight, CheckCircle, Redo, PlayCircle, Bookmark } from "lucide-react";
+import { Dumbbell, Clock, ArrowRight, Check, Redo, PlayCircle, Bookmark, Flame, Flag } from "lucide-react";
 
 interface WorkoutPlanProps {
   workout: UserWorkout;
@@ -133,7 +133,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
           <div className="flex justify-between mb-3">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                <i className="fas fa-clock text-blue-500 text-xs"></i>
+                <Clock className="h-4 w-4 text-blue-500" />
               </div>
               <div>
                 <p className="text-xs text-gray-500">Duration</p>
@@ -142,7 +142,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
             </div>
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-2">
-                <i className="fas fa-fire text-orange-500 text-xs"></i>
+                <Flame className="h-4 w-4 text-orange-500" />
               </div>
               <div>
                 <p className="text-xs text-gray-500">Calories</p>
@@ -151,7 +151,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
             </div>
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                <i className="fas fa-dumbbell text-purple-500 text-xs"></i>
+                <Dumbbell className="h-4 w-4 text-purple-500" />
               </div>
               <div>
                 <p className="text-xs text-gray-500">Exercises</p>
@@ -165,7 +165,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
               className="flex-1 bg-primary text-white py-2 rounded-xl text-sm hover:bg-primary/90"
               onClick={startWorkout}
             >
-              <i className="fas fa-play-circle mr-2"></i>
+              <PlayCircle className="h-4 w-4 mr-2" />
               Start Workout
             </Button>
             <Button
@@ -173,7 +173,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center p-0"
               onClick={handleSave}
             >
-              <i className={`${saved ? 'fas fa-bookmark text-blue-500' : 'far fa-bookmark text-gray-400'}`}></i>
+              <Bookmark className={`h-5 w-5 ${saved ? 'fill-blue-500 text-blue-500' : 'text-gray-400'}`} />
             </Button>
           </div>
         </div>
@@ -210,7 +210,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
                     size="sm"
                     onClick={() => setExerciseProgress(Math.min(exerciseProgress + 20, 100))}
                   >
-                    <i className="fas fa-check mr-1"></i> Complete Set
+                    <Check className="h-4 w-4 mr-1" /> Complete Set
                   </Button>
 
                   <Button
@@ -220,9 +220,9 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
                     disabled={exerciseProgress < 100}
                   >
                     {currentExercise < workout.exercises.length - 1 ? (
-                      <>Next Exercise<i className="fas fa-arrow-right ml-1"></i></>
+                      <>Next Exercise<ArrowRight className="h-4 w-4 ml-1" /></>
                     ) : (
-                      <>Finish Workout<i className="fas fa-flag-checkered ml-1"></i></>
+                      <>Finish Workout<Flag className="h-4 w-4 ml-1" /></>
                     )}
                   </Button>
                 </div>
@@ -243,7 +243,7 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
                             : 'bg-gray-100 text-gray-500'
                       }`}>
                         {index < currentExercise ? (
-                          <i className="fas fa-check text-xs"></i>
+                          <Check className="h-3 w-3" />
                         ) : (
                           index + 1
                         )}
@@ -265,17 +265,17 @@ export const WorkoutCard = ({ workout }: { workout: any }) => {
 
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <i className="fas fa-clock text-blue-500 mb-1"></i>
+                  <Clock className="h-5 w-5 text-blue-500 mx-auto mb-1" />
                   <p className="text-sm font-medium">{workout.duration} min</p>
                   <p className="text-xs text-gray-500">Duration</p>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <i className="fas fa-fire text-orange-500 mb-1"></i>
+                  <Flame className="h-5 w-5 text-orange-500 mx-auto mb-1" />
                   <p className="text-sm font-medium">{workout.caloriesBurned}</p>
                   <p className="text-xs text-gray-500">Calories</p>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <i className="fas fa-dumbbell text-purple-500 mb-1"></i>
+                  <Dumbbell className="h-5 w-5 text-purple-500 mx-auto mb-1" />
                   <p className="text-sm font-medium">{workout.difficulty}</p>
                   <p className="text-xs text-gray-500">Level</p>
                 </div>
