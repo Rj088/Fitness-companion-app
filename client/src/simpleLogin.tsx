@@ -17,24 +17,17 @@ function SimpleLogin() {
   
   console.log("Rendering SimpleLogin component");
   
-  // Check if user is already logged in
+  // Check if user is already logged in with forced redirect approach
   useEffect(() => {
-    // Store a flag in sessionStorage to prevent infinite loops
-    const redirectAttempted = sessionStorage.getItem('redirect_attempted');
+    // Clear all redirection flags from previous sessions
+    sessionStorage.removeItem('redirect_attempted');
     
-    if (redirectAttempted) {
-      console.log("Redirect already attempted in this session, preventing loop");
-      return;
-    }
-    
+    // Check for an active user ID
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (userId) {
-      console.log("Checking auth for user ID:", userId);
+      console.log("SimpleLogin: Detected existing user ID, checking auth status:", userId);
       
-      // Set the flag to prevent loops
-      sessionStorage.setItem('redirect_attempted', 'true');
-      
-      // Verify user exists on the server
+      // Verify the user exists on the server
       fetch(`/api/users/${userId}`)
         .then(res => {
           if (!res.ok) {
@@ -44,24 +37,30 @@ function SimpleLogin() {
         })
         .then(data => {
           if (data.message === "User not found" || !data.id) {
-            console.log("User auth check failed, clearing stored data");
+            console.log("SimpleLogin: User auth check failed, clearing stored data");
             localStorage.removeItem(STORAGE_KEYS.USER_ID);
-            sessionStorage.removeItem('redirect_attempted');
             return;
           }
           
-          console.log("User auth check successful:", data);
-          // Redirect to home page immediately if user is authenticated
-          window.location.href = '/';
+          console.log("SimpleLogin: User auth check successful:", data);
+          
+          // Perform a direct navigation without using React router
+          console.log("SimpleLogin: Performing forced navigation to home page");
+          
+          // Set flags for home component to detect
+          localStorage.setItem('LOGIN_REDIRECT_SUCCESS', 'true');
+          localStorage.setItem('LOGIN_REDIRECT_TIMESTAMP', new Date().getTime().toString());
+          
+          // Force navigation with direct approach (most reliable)
+          window.location.replace('/');
         })
         .catch(err => {
-          console.error("Failed to verify user:", err);
+          console.error("SimpleLogin: Failed to verify user:", err);
           // Clear invalid user ID
           localStorage.removeItem(STORAGE_KEYS.USER_ID);
-          sessionStorage.removeItem('redirect_attempted');
         });
     } else {
-      console.log("No stored user ID found, not authenticated");
+      console.log("SimpleLogin: No stored user ID found, not authenticated");
     }
   }, []);
   
@@ -108,15 +107,20 @@ function SimpleLogin() {
       try {
         console.log("SimpleLogin: Executing direct homepage navigation");
         
-        // Use window.open with _self for most reliable navigation reset
-        window.open('/', '_self');
+        // Use location.replace for most reliable navigation with no history entry
+        window.location.replace('/');
+        
+        // Use a fallback if the primary method doesn't trigger navigation after a short delay
+        setTimeout(() => {
+          if (window.location.pathname !== '/') {
+            console.log("SimpleLogin: Using fallback navigation method");
+            window.location.href = '/';
+          }
+        }, 300);
       } catch (e) {
-        console.error("SimpleLogin: Primary redirect method failed:", e);
+        console.error("SimpleLogin: Redirect methods failed:", e);
         
-        // Add a backup flag for emergency situations
-        localStorage.setItem('REDIRECT_EMERGENCY', 'true');
-        
-        // Try fallback method without alert for better UX
+        // Last resort emergency approach - force reload to homepage
         window.location.href = '/';
       }
     }, 100);

@@ -64,8 +64,12 @@ function App() {
     );
   }
 
-  // Show the login page directly if not authenticated
+  // Direct rendering approach - bypass router for more reliable navigation
+  
+  // Force redirect to login if not authenticated
   if (!isAuthenticated) {
+    console.log("App: User not authenticated, rendering auth page");
+    
     return (
       <div className="h-screen flex flex-col bg-gray-100">
         <StatusBar />
@@ -77,39 +81,20 @@ function App() {
     );
   }
 
-  // Show the main app layout if authenticated
-  console.log("App: User is authenticated, rendering main layout");
+  // Direct rendering of the home page (bypassing router) when authenticated
+  console.log("App: User is authenticated, rendering home page directly");
   
-  // Enhanced error boundary to catch any rendering issues
-  try {
-    return (
-      <div className="h-screen flex flex-col bg-gray-100">
-        <StatusBar />
-        <div className="flex-1 overflow-y-auto pb-24">
-          <Router />
-        </div>
-        <TabBar />
-        <Toaster />
+  return (
+    <div className="h-screen flex flex-col bg-gray-100">
+      <StatusBar />
+      <div className="flex-1 overflow-y-auto pb-24">
+        {/* Directly use the Home component instead of Router */}
+        <Home />
       </div>
-    );
-  } catch (error) {
-    console.error("App rendering error:", error);
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-4">Something went wrong</h2>
-          <p className="mb-4">We're having trouble displaying the app.</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md"
-          >
-            Reload page
-          </button>
-        </div>
-        <Toaster />
-      </div>
-    );
-  }
+      <TabBar />
+      <Toaster />
+    </div>
+  );
 }
 
 function Router() {

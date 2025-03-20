@@ -3,6 +3,7 @@ import { useUser } from "@/lib/hooks/useUser";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
 import { useActivities } from "@/lib/hooks/useProgress";
 import { useUserMeals } from "@/lib/hooks/useNutrition";
+import { useAuth } from "@/lib/context/AuthContext";
 import CircularProgress from "@/components/CircularProgress";
 import WorkoutPlan from "@/components/workout/WorkoutPlan";
 import MacroSummary from "@/components/nutrition/MacroSummary";
@@ -10,9 +11,11 @@ import MealItem from "@/components/nutrition/MealItem";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { LogOut } from "lucide-react";
 
 export default function Home() {
   const { toast } = useToast();
+  const { logout } = useAuth();
   
   // Enhanced check for redirection success flags
   useEffect(() => {
@@ -117,6 +120,31 @@ export default function Home() {
 
   // Get today's workout
   const todayWorkout = userWorkouts && userWorkouts.length > 0 ? userWorkouts[0] : null;
+  
+  // Handle logout function
+  const handleLogout = async () => {
+    try {
+      console.log("Home: Starting logout process");
+      toast({
+        title: "Logging out",
+        description: "Please wait...",
+      });
+      
+      await logout();
+      
+      console.log("Home: Logout successful, redirecting to login page");
+      
+      // Force navigation with direct approach
+      window.location.replace('/auth');
+    } catch (error) {
+      console.error("Home: Logout failed:", error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div id="home-screen" className="bg-white pb-24">
@@ -136,10 +164,25 @@ export default function Home() {
               </>
             )}
           </div>
-          <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-            <span className="font-medium text-gray-600">
-              {user?.firstName?.charAt(0) || 'U'}
-            </span>
+          
+          <div className="flex items-center space-x-3">
+            {/* Logout button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleLogout}
+              className="h-9 w-9 rounded-full"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5 text-gray-500" />
+            </Button>
+            
+            {/* User avatar */}
+            <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+              <span className="font-medium text-gray-600">
+                {user?.firstName?.charAt(0) || 'U'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
