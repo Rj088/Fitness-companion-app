@@ -115,9 +115,11 @@ export function useDeleteMeal() {
       return response.status === 204; // No content response
     },
     onSuccess: () => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate user meals queries
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.MEALS.LIST(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.MEALS.LIST(userId)] 
       });
       
       toast({

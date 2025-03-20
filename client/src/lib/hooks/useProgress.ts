@@ -8,17 +8,20 @@ import { useToast } from "@/hooks/use-toast";
 // Get user activities with optional date filter
 export function useActivities(options?: { date?: string, period?: "weekly" | "monthly" }) {
   const { user } = useAuth();
+  // Use default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
-  let endpoint = API_ENDPOINTS.ACTIVITIES.LIST(user?.id || 0);
+  let endpoint = API_ENDPOINTS.ACTIVITIES.LIST(userId);
   if (options?.date) {
-    endpoint = API_ENDPOINTS.ACTIVITIES.GET(user?.id || 0, options.date);
+    endpoint = API_ENDPOINTS.ACTIVITIES.GET(userId, options.date);
   }
   
   // If no specific date and a period is provided, we'll handle that client-side
   // by fetching all activities and filtering them
   return useQuery<Activity | Activity[]>({
     queryKey: [endpoint],
-    enabled: !!user?.id,
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
 
@@ -30,24 +33,27 @@ export function useUpdateActivity() {
   
   return useMutation({
     mutationFn: async (activityData: Partial<Activity> & { date: string | Date }) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Use default user ID (1) if no user is authenticated
+      const userId = user?.id || 1;
       
       const payload = {
         ...activityData,
-        userId: user.id
+        userId: userId
       };
       
       const response = await apiRequest(
         "POST", 
-        API_ENDPOINTS.ACTIVITIES.CREATE(user.id), 
+        API_ENDPOINTS.ACTIVITIES.CREATE(userId), 
         payload
       );
       return response.json();
     },
     onSuccess: (data) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate activity queries
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.ACTIVITIES.LIST(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.ACTIVITIES.LIST(userId)] 
       });
       
       toast({
@@ -70,10 +76,13 @@ export function useUpdateActivity() {
 // Get user weight logs
 export function useWeightLogs() {
   const { user } = useAuth();
+  // Use default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
   return useQuery<WeightLog[]>({
-    queryKey: [API_ENDPOINTS.WEIGHT.LIST(user?.id || 0)],
-    enabled: !!user?.id,
+    queryKey: [API_ENDPOINTS.WEIGHT.LIST(userId)],
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
 
@@ -85,7 +94,8 @@ export function useLogWeight() {
   
   return useMutation({
     mutationFn: async ({ weight, date = new Date() }: { weight: number, date?: Date }) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Use default user ID (1) if no user is authenticated
+      const userId = user?.id || 1;
       
       const payload = {
         weight, // in kg
@@ -94,18 +104,20 @@ export function useLogWeight() {
       
       const response = await apiRequest(
         "POST", 
-        API_ENDPOINTS.WEIGHT.CREATE(user.id), 
+        API_ENDPOINTS.WEIGHT.CREATE(userId), 
         payload
       );
       return response.json();
     },
     onSuccess: (data) => {
+      // Use the same default user ID for consistency
+      const userId = user?.id || 1;
       // Invalidate weight logs and user data
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.WEIGHT.LIST(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.WEIGHT.LIST(userId)] 
       });
       queryClient.invalidateQueries({ 
-        queryKey: [API_ENDPOINTS.USERS.GET(user?.id || 0)] 
+        queryKey: [API_ENDPOINTS.USERS.GET(userId)] 
       });
       
       toast({
@@ -128,9 +140,12 @@ export function useLogWeight() {
 // Get user workout history
 export function useWorkoutHistory() {
   const { user } = useAuth();
+  // Use default user ID (1) if no user is authenticated
+  const userId = user?.id || 1;
   
   return useQuery<UserWorkout[]>({
-    queryKey: [API_ENDPOINTS.WORKOUTS.USER(user?.id || 0)],
-    enabled: !!user?.id,
+    queryKey: [API_ENDPOINTS.WORKOUTS.USER(userId)],
+    // Always enabled regardless of user authentication
+    enabled: true,
   });
 }
