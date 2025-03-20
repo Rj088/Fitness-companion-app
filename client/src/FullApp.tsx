@@ -323,6 +323,18 @@ window.useAuth = () => {
   };
 };
 
+// Set up mock implementation for AI workout generation
+import { generateWorkoutRecommendationAI, parseWorkoutResponse } from "@/lib/xai";
+
+// Mock implementation for AI workout recommendation
+//@ts-ignore
+window.generateWorkoutRecommendation = async (user: User, preferences: any) => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  return generateWorkoutRecommendationAI(user, preferences);
+};
+
 //@ts-ignore
 window.useUser = () => {
   return {
