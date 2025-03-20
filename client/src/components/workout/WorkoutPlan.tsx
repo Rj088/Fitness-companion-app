@@ -4,6 +4,7 @@ import { UserWorkout } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Dumbbell, Clock, ArrowRight, CheckCircle, Redo, PlayCircle, Bookmark } from "lucide-react";
 
 interface WorkoutPlanProps {
   workout: UserWorkout;
@@ -23,7 +24,7 @@ export default function WorkoutPlan({ workout }: WorkoutPlanProps) {
     <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
       <div className="flex items-center mb-4">
         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
-          <i className="fas fa-dumbbell text-primary"></i>
+          <Dumbbell className="h-6 w-6 text-primary" />
         </div>
         <div className="flex-1">
           <h3 className="font-medium">{name}</h3>

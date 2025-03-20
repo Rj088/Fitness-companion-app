@@ -63,19 +63,33 @@ export default function Home() {
     
     return () => clearTimeout(timeoutId);
   }, [toast]);
+  // Get user data with proper fallbacks
   const { data: user, isLoading: isLoadingUser } = useUser();
+  
+  // Create default activity values if none exists
+  const defaultActivity = {
+    steps: 0,
+    caloriesBurned: 0,
+    activeMinutes: 0
+  };
+  
+  // Get today's activity data with fallback
   const { data: todayActivities, isLoading: isLoadingActivities } = useActivities();
+  
+  // Get today's workouts
   const { data: userWorkouts, isLoading: isLoadingWorkouts } = useWorkouts({ 
     date: new Date().toISOString().split('T')[0] 
   });
+  
+  // Get today's meals
   const { data: userMeals, isLoading: isLoadingMeals } = useUserMeals({ 
     date: new Date().toISOString().split('T')[0] 
   });
 
-  // Get the activity data as a single record
+  // Get the activity data as a single record with fallback
   const activity = Array.isArray(todayActivities) 
-    ? todayActivities[0] 
-    : todayActivities;
+    ? (todayActivities[0] || defaultActivity)
+    : (todayActivities || defaultActivity);
     
   // Calculate steps percentage
   const stepsPercentage = user && activity 
