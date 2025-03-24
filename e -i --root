@@ -1,0 +1,151 @@
+[33mc496b2f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Save changes before history rewrite
+[33ma7688e8[m Update documentation
+[33m70e394d[m Agent checkpoint
+[33m35890b6[m Update README with iOS development notes and no-login feature highlight
+[33m0897505[m Agent checkpoint
+[33m3281cf7[m Add MIT license
+[33m4fc0bdd[m Add GitHub Actions CI workflow
+[33m3a9b208[m Add comprehensive .gitignore and README.md files.
+[33m80faeab[m Add iOS build artifact.
+[33m25debbb[m Agent checkpoint
+[33m37dcb4e[m Enhance AI workout recommendation:  Improve UI to dynamically display category and update workout suggestions based on selected category.
+[33m5be055c[m Enhance AI workout generation with workout type selection and improved AI response generation.
+[33m7000ba6[m Add mock workout history data for new users.
+[33m261038b[m Add screenshot demonstrating missing workout history issue.
+[33m3f02fc6[m Add progress screen mockups.
+[33m7d980f8[m Fix: Handle unauthenticated users in `useUser` and `useUpdateUser` hooks by using a default user ID.
+[33m6c73f1a[m Fix: Handle unauthenticated users by using a default user ID for data access.  This ensures consistent data retrieval even without user authentication.
+[33mc4cf914[m Fix: Allow workout and meal tracking without user authentication by using a default user ID.  Improves data access for testing and potentially guest users.
+[33m58164c0[m Remove user authentication requirement for AI-generated workout and nutrition recommendations.
+[33m7a15973[m Replace mock AI workout generation with live integration and add global user store.
+[33m7dbaade[m Implement basic AI workout generation; remove dependency on external API.
+[33mae0e163[m Add mock AI workout generation functionality.
+[33ma4cc5cc[m Implement mock data and full application rendering for comprehensive testing.
+[33mfc76992[m Remove authentication; implement direct app access with mock data for development.
+[33m4d82d61[m Bypass authentication for development: Added a mock user and modified the `useAuth` hook to skip the login page during development.
+[33m2217e4a[m Remove forced login page and enable direct app access for development.
+[33m32b93c5[m Add temporary login page to directly access the home page for demonstration purposes.
+[33m3210c27[m Agent checkpoint
+[33m4626a99[m Fix: Ensure redirection to app after login/registration by forcing page reload
+[33m9e15cd2[m Simplify authentication flow by removing unnecessary redirects and cleanup of legacy redirection flags.
+[33mf2afcaf[m Fix: Redirect to Router after login to resolve home page display issue.
+[33mdcffa86[m Agent checkpoint
+[33m1921808[m Fix: Correct redirection to home page after authentication
+[33m384bbd8[m Refactor workout display: Improve type safety, replace Font Awesome icons with custom SVGs.
+[33m4a5dcac[m Update workout card icons to Lucide-React components.
+[33m6570d31[m Improve user experience after login:  Replaced Font Awesome icons with Lucide-React icons and added robust fallback mechanisms for user data and activity tracking to handle cases where data might be missing.
+[33m52d5cef[m Agent checkpoint
+[33mc384191[m Refactor: Simplify authentication flow and remove legacy redirection logic.
+[33md90f7eb[m Fix: Prevent redirection loop after successful login
+[33m59a7c7d[m Refactor authentication and navigation: Improve authentication flow and implement direct page rendering for enhanced reliability.
+[33mc0715c1[m Agent checkpoint
+[33mf24d2f0[m Agent checkpoint
+[33m3fadebb[m Refactor: Improve login redirect handling and user experience.  Enhance error handling and add visual feedback using toasts.
+[33m454e3da[m Improve authentication flow and logout handling: Enhance redirect mechanisms for smoother user experience after login and logout, implement complete storage cleanup, and add toast notifications for feedback.
+[33m9bd5375[m Fix: Improve login redirection reliability and add success toast message.  Addresses issues with inconsistent redirection after authentication.
+[33m5c797ed[m Add useRef hook to App component.
+[33mf76c749[m Improve authentication redirect handling to prevent infinite redirect loops.  Adds session storage flags and refines redirection logic for smoother user experience.
+[33mf2869d4[m Enhance authentication flow and error handling: Improved redirect handling after login/logout, added error boundaries, and visual feedback for authentication actions.
+[33mdbf14a5[m Agent checkpoint
+[33me5ccd1d[m Fix: Correct redirection after login/signup to homepage; improved error handling for user authentication.
+[33mb279208[m Fix: Enhance login redirect reliability and add server-side authentication check.
+[33m048dcd9[m Bypass AuthContext: Implement direct API calls for login and registration.
+[33m4e455c7[m Integrate authentication context and React Query into login flow.  Improve error handling and user experience.
+[33m5149c25[m Implement user dashboard and improve login redirection.
+[33m4d7e521[m Add basic user registration and login functionality.
+[33m98249d3[m Add loading indicator to authentication flow and improve authentication handling.
+[33m363e278[m Fix: Improve authentication flow and loading indicator display
+[33m94e259a[m Replace simple login component with integrated App component.
+[33m7f09717[m Improve login error handling and user ID storage
+[33m9655d6e[m Add user registration functionality and improve login.
+[33m85d147b[m Implement simple login component for testing purposes.
+[33mcf6e743[m Implement a new authentication component for login and registration.
+[33maaa1560[m Add a simplified debug authentication page to aid troubleshooting.
+[33m8a64236[m Fix: Update navigation in SimpleAuth component to use `setLocation` instead of `navigate`.
+[33m1ae4cc9[m Fix: Correctly update location state in SimpleAuth component.
+[33md56de4a[m Replace SimpleAuth component with AuthPage for improved authentication flow.
+[33m9a86d03[m Agent checkpoint
+[33m0f6e11c[m Refactor: Use constants for localStorage keys in authentication pages.
+[33m9e55b44[m Implement user logout functionality.
+[33maa6fbd4[m New agent session start
+[33m4c89775[m Assistant checkpoint: Implement complete auth page with registration/login
+[33mffe953b[m Initial commit
+[33m3a46a9f[m Fix: Resolve issue preventing access to main application pages after login.  Improved authentication flow and added loading indicator.
+[33ma6f35be[m Refactor authentication and API endpoints; move authentication logic to backend.
+[33md3ad4f8[m Assistant checkpoint: Implemented user login and registration functionality
+[33m8500d6c[m Assistant checkpoint: Added user authentication flow with login/logout
+[33m3975536[m Assistant checkpoint: Fix React Query configuration
+[33m7262943[m Assistant checkpoint: Enhanced app UI/UX with working components
+[33mf529ab8[m Assistant checkpoint: Added required camera/photo privacy descriptions
+[33me2ae77c[m Assistant checkpoint: Add privacy permissions and fix app initialization
+[33m5a0ca05[m Checkpoint before assistant change: Document simulator launch failure:  io.replit.fitness application failed to launch due to process exit after launch.  Includes detailed error logs and system information.
+[33m95e5d60[m Assistant checkpoint: Fix privacy errors by updating initialization and permissions
+[33m26654db[m Checkpoint before assistant change: Add screenshot demonstrating user privacy error.
+[33mb6ad5d8[m Assistant checkpoint: Removed all privacy permission requests from AppDelegate
+[33m14b88c0[m Assistant checkpoint: Updated Info.plist with all privacy permissions
+[33mb7089fb[m Assistant checkpoint: Added all required privacy usage descriptions
+[33m4160e81[m Assistant checkpoint: Added required iOS privacy description keys
+[33m8d7ab5f[m Checkpoint before assistant change: Add screenshot to illustrate user query.
+[33m5d59b76[m Assistant checkpoint: Added missing privacy description for motion usage
+[33md97b14a[m Checkpoint before assistant change: Attach screenshot illustrating multi-thread issue.
+[33m3f9e190[m Assistant checkpoint: Added required iOS privacy permissions
+[33m13596fb[m Checkpoint before assistant change: Document simulator device launch failure: io.replit.fitness application exited after launch.  Includes error details and system information.
+[33m39f41b9[m Assistant checkpoint: Fixed iOS privacy permissions and HealthKit integration
+[33m97069a4[m Checkpoint before assistant change: Attach screenshot illustrating thread loop issue.
+[33m8b4e279[m Assistant checkpoint: Added required privacy usage descriptions
+[33m68e1ee0[m Checkpoint before assistant change: Attach screenshot of user issue report.
+[33m0b57b72[m Assistant checkpoint: Added all required privacy permissions and fixed AppDelegate
+[33m20866ed[m Checkpoint before assistant change: Add screenshot illustrating resolved issues.
+[33m5cbd746[m Assistant checkpoint: Add iOS permission descriptions and initialize permissions
+[33m95cf6f4[m Checkpoint before assistant change: Add screenshot illustrating user reported issue.
+[33m5584699[m Assistant checkpoint: Added additional iOS privacy permission descriptions
+[33m7fd713c[m Assistant checkpoint: Added NSUserTrackingUsageDescription to Info.plist
+[33m7d39cac[m Checkpoint before assistant change: Add screenshot of fast execution.
+[33mf25f8fc[m Assistant checkpoint: Added photo library usage description to Info.plist
+[33m838af37[m Checkpoint before assistant change: Add screenshots to illustrate the issue.
+[33m520d303[m Checkpoint before assistant change: Add screenshots.
+[33mad2a4a6[m Assistant checkpoint: Add privacy usage descriptions to Info.plist
+[33me267df4[m Checkpoint before assistant change: Add screenshots illustrating the "replace existing item" prompt.
+[33m64c85d7[m Checkpoint before assistant change: Add screenshots.
+[33m9a30f06[m Checkpoint before assistant change: Add iOS fitness app project files and architecture documentation.  Includes Xcode workspace, screenshots, and a detailed description of the full-stack application architecture.
+[33m6458694[m Update Capacitor config for production deployment; changed app ID, name, and server settings.
+[33m81aeee6[m Bypass authentication for demo purposes, making all app features directly accessible.
+[33me048918[m Fix: Resolved port conflict and ensured application serves on port 5000.
+[33mb3fb25c[m Agent checkpoint
+[33m54320e3[m Improve Home page data handling and display of fitness metrics; handle potential null values for improved robustness.
+[33m68bdadf[m Update UI components: Improve color handling in CircularProgress, replace Font Awesome icons with Lucide-React in MealItem and Home page.
+[33m8be0c20[m Fix: Redirect to home page after login/registration using window.location.href
+[33m4143198[m Add user registration functionality to the authentication page.
+[33ma224aa2[m Update routing to include a simple authentication page.
+[33m54c02d9[m Agent checkpoint
+[33m4baffd4[m Implement secure password hashing and add a simplified login page.
+[33mc5f3541[m Add test page for routing verification
+[33m02f9651[m Fix: Implement direct API call for login and add toast notifications for better user experience.
+[33m5bc2609[m Fix: Improve authentication flow and add error handling.  Includes improved logging for debugging.
+[33m7858ac6[m Temporarily disable authentication redirects for debugging.
+[33m22ec69d[m Restored to '97a87806fad8ce1b71567e82aa35c7f950140fdb'
+[33mb9d3ce9[m Checkpoint before revert - Build the initial prototype
+[33m2342537[m Agent checkpoint
+[33m574bd7b[m Add debug page route
+[33m31ad29e[m Add debug page for authentication.
+[33m6d094f3[m Agent checkpoint
+[33m5ef1aa4[m Agent checkpoint
+[33m4890b39[m Add basic HTML test page for authentication.
+[33m0a5728c[m Add screenshot demonstrating hover issue.
+[33m5af370a[m Agent checkpoint
+[33m92c55e7[m Agent checkpoint
+[33ma8219fe[m Fix: Prevent rendering of UI elements for unauthenticated users
+[33mf72b7cc[m Implement user authentication with login and logout functionality.
+[33m128eb3d[m Implement user authentication with login and registration functionality.
+[33m549bfd2[m Implement step tracking functionality using device motion sensors.  Adds step counting logic, UI updates, and native iOS/Android plugin integration.
+[33md932cf9[m Integrate native device features (camera, geolocation, notifications) and add splash screen.
+[33mcc4b1ac[m Update iOS app splash screen and add necessary permissions for camera, location, motion, and health data access.
+[33me7bbefc[m Add SVG app icons and splash screen assets.
+[33m266b357[m Add iOS project files and configurations for Capacitor app.
+[33mc2f0252[m Add CapacitorJS for iOS mobile app development.
+[33m1a77f72[m Agent checkpoint
+[33ma0789fd[m Implement AI-powered workout generation and integrate xAI API for personalized workout recommendations.
+[33ma8f2e76[m Enhance workout planning with AI-powered recommendations, keyword search, and new workout categories.  Adds new components and API integration.
+[33m58efa17[m Add initial UI components and project setup for iOS-styled fitness tracking web application.
+[33mc142cde[m Checkpoint after starting plan
+[33mea424a8[m Initial commit
